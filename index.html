@@ -323,19 +323,12 @@
       font-size: clamp(1.5rem, 2.2vw, 2.5rem);
       letter-spacing: 2px;
     }
-    .rating {
-      font-size: clamp(2.4rem, 3.2vw, 4rem);
-      color: var(--gold);
-      margin: 12px 0 8px;
-      font-style: italic;
-    }
-    .players {
-      font-family: Arial, sans-serif;
-      color: #d7d7d7;
-      line-height: 1.7;
-      font-size: 0.97rem;
-      text-align: left;
-      margin-left: 16px;
+    .team-ball {
+      display: grid;
+      place-items: center;
+      min-height: 150px;
+      font-size: 7rem;
+      line-height: 1;
     }
     .versus {
       font-size: clamp(2.2rem, 4vw, 3.6rem);
@@ -390,25 +383,15 @@
     <div class="matchup">
       <div class="team-card">
         <div class="team-title">WARRIORS</div>
-        <div class="rating">94 OVR</div>
-        <div class="players">
-          <strong>S. Curry (PG) - 97 OVR</strong><br />
-          B. Hield (SG) - 81 OVR<br />
-          A. Wiggins (SF) - 80 OVR<br />
-          D. Green (PF) - 83 OVR<br />
-          T. Jackson-Davis (C) - 78 OVR
+        <div class="team-ball" aria-hidden="true">
+          🏀
         </div>
       </div>
       <div class="versus">VS</div>
       <div class="team-card red">
         <div class="team-title">RAPTORS</div>
-        <div class="rating">84 OVR</div>
-        <div class="players">
-          I. Quickley (PG) - 82 OVR<br />
-          R. Barrett (SG) - 84 OVR<br />
-          S. Barnes (SF) - 87 OVR<br />
-          K. Olynyk (PF) - 78 OVR<br />
-          J. Poeltl (C) - 80 OVR
+        <div class="team-ball" aria-hidden="true">
+          🏀
         </div>
       </div>
     </div>
@@ -1163,8 +1146,7 @@
       const isOpponentShot = (defender === 'player' && state.shotShooter === 'cpu')
         || (defender === 'cpu' && state.shotShooter === 'player');
       const distance = Math.hypot(blocker.x - shooter.x, blocker.z - shooter.z);
-      const inFront = blocker.z < shooter.z + 1.5;
-      if (!isOpponentShot || distance > 4.2 || !inFront) return false;
+      if (!isOpponentShot || distance > 4.2) return false;
 
       state.blockActive = true;
       state.blockProgress = 0;
@@ -1231,7 +1213,7 @@
             state.dunkPhase = '';
             state.dunkProgress = 0;
             state.canShoot = true;
-            awardPossession('cpu');
+            awardPossession('cpu', 'player');
           }
         } else {
           playerRoot.position.y = Math.sin(Math.PI * p) * 1.2;
@@ -1260,7 +1242,7 @@
             const cpuDistance = Math.hypot(state.cpu.x - state.player.x, state.cpu.z - state.player.z);
             if (state.shotProgress >= 0.2 && cpuDistance <= 4.2) {
               state.cpuBlockAttempted = true;
-              if (Math.random() < 0.58 && tryBlock('cpu')) return;
+              if (Math.random() < 0.25 && tryBlock('cpu')) return;
             }
           }
           ballMesh.position.x = THREE.MathUtils.lerp(state.shotOrigin.x, state.shotEndpoint.x, p);
@@ -1331,7 +1313,7 @@
       state.shotProgress = 0;
       state.isBallInAir = false;
       state.canShoot = true;
-      awardPossession(nextPossession);
+      awardPossession(nextPossession, state.shotShooter);
     }
 
     function resetAfterMiss() {
@@ -1352,14 +1334,21 @@
       awardPossession(state.shotShooter === 'player' ? 'cpu' : 'player');
     }
 
-    function awardPossession(recipient) {
+    function awardPossession(recipient, scorer = '') {
       state.possession = recipient;
       const receiver = recipient === 'player' ? state.player : state.cpu;
       const opponent = recipient === 'player' ? state.cpu : state.player;
-      receiver.x = 0;
-      receiver.z = state.possessionLine + 3;
-      opponent.x = recipient === 'player' ? 3 : -3;
-      opponent.z = state.possessionLine + 5;
+      if (scorer) {
+        receiver.x = 0;
+        receiver.z = state.possessionLine;
+        opponent.x = 0;
+        opponent.z = -6.5;
+      } else {
+        receiver.x = 0;
+        receiver.z = state.possessionLine + 3;
+        opponent.x = recipient === 'player' ? 3 : -3;
+        opponent.z = state.possessionLine + 5;
+      }
       state.possessionResetTimer = 1.2;
       state.shotClock = 24;
       state.cpuShotCooldown = 1.5;
