@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NBA 2K27 - Ultimate Chromebook Edition</title>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <style>
+    :root {
+      --bg: #060606;
+      --panel: rgba(12, 12, 12, 0.8);
+      --gold: #ff9900;
+      --green: #47ff78;
+      --red: #ff4a4a;
+      --court: #d49959;
+      --line: rgba(255,255,255,0.92);
+      --text: #f3f3f3;
+      --muted: #dfe3e8;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      color: var(--text);
+      font-family: Impact, 'Arial Black', Arial, sans-serif;
+      user-select: none;
+    }
+
+    #game-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      display: none;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #0d0d0d 0%, #050505 55%, #000 100%);
+    }
+
+    #canvas-wrap {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
+    #graphics-error {
+      position: absolute;
+      inset: 0;
+      z-index: 40;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(0,0,0,0.92);
+      color: #fff;
+      font: 600 1rem/1.6 Arial, sans-serif;
+      text-align: center;
+    }
+
+    #hud {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 25;
+      background: linear-gradient(180deg, rgba(18,18,18,0.96), rgba(25,25,25,0.9));
+      border-bottom: 4px solid var(--gold);
+      border-radius: 0 0 18px 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      padding: 10px 34px;
+      font-size: clamp(1.2rem, 1.8vw, 2.1rem);
+      letter-spacing: 2px;
+    }
+
+    #shot-clock {
+      position: absolute;
+      top: 82px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 25;
+      min-width: 64px;
+      padding: 5px 12px;
+      border: 2px solid var(--gold);
+      border-radius: 10px;
+      background: rgba(0,0,0,0.88);
+      color: var(--gold);
+      font-size: 1.5rem;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #rules-panel {
+      position: absolute;
+      left: 22px;
+      top: 94px;
+      width: min(360px, 30vw);
+      z-index: 25;
+      background: rgba(14,14,14,0.83);
+      border-left: 4px solid var(--gold);
+      border-radius: 14px;
+      padding: 14px 16px 12px;
+      backdrop-filter: blur(3px);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.35);
+    }
+
+    #rules-panel h2 {
+      margin: 0 0 10px;
+      font-size: 1.5rem;
+      color: var(--gold);
+      letter-spacing: 1px;
+    }
+
+    #rules-panel ul {
+      margin: 0;
+      padding-left: 18px;
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    #controls-hint {
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
+      z-index: 25;
+      background: rgba(0,0,0,0.68);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 12px;
+      padding: 13px 14px;
+      font-family: Arial, sans-serif;
+      font-size: 0.86rem;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    #shot-meter {
+      position: absolute;
+      left: 50%;
+      top: 68%;
+      transform: translate(-50%, -50%);
+      z-index: 30;
+      width: 44px;
+      height: 170px;
+      border-radius: 18px;
+      border: 2px solid rgba(255,255,255,0.8);
+      background: rgba(0,0,0,0.7);
+      overflow: hidden;
+      display: none;
+      box-shadow: 0 0 18px rgba(0,0,0,0.35);
+    }
+
+    #block-meter {
+      position: absolute;
+      left: calc(50% + 58px);
+      top: 68%;
+      transform: translate(-50%, -50%);
+      z-index: 30;
+      width: 44px;
+      height: 170px;
+      border-radius: 18px;
+      border: 2px solid rgba(255,255,255,0.8);
+      background: rgba(0,0,0,0.7);
+      overflow: hidden;
+      display: none;
+      box-shadow: 0 0 18px rgba(0,0,0,0.35);
+    }
+
+    .green-zone {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 22%;
+      height: 28%;
+      background: rgba(71,255,120,0.85);
+      box-shadow: 0 0 18px rgba(71,255,120,0.72);
+    }
+
+    .meter-fill {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 0%;
+      background: linear-gradient(180deg, #ffd28f 0%, #ff9a00 100%);
+    }
+
+    .meter-label {
+      position: absolute;
+      left: 50%;
+      top: -26px;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    #shot-status {
+      position: absolute;
+      left: 50%;
+      top: 42%;
+      transform: translate(-50%, -50%);
+      z-index: 30;
+      font-size: clamp(1rem, 1.5vw, 1.4rem);
+      opacity: 0;
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.8);
+      transition: opacity 0.15s ease;
+    }
+
+    #replay-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      border: 14px solid var(--gold);
+      background: rgba(255,153,0,0.06);
+      pointer-events: none;
+    }
+
+    #replay-overlay .tag {
+      position: absolute;
+      right: 42px;
+      top: 42px;
+      background: rgba(255, 30, 30, 0.88);
+      color: white;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 1.3rem;
+      letter-spacing: 1px;
+      animation: flash 0.8s infinite alternate;
+    }
+
+    #end-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(4px);
+    }
+
+    #end-box {
+      width: min(580px, 80vw);
+      background: rgba(15,15,15,0.95);
+      border: 3px solid var(--gold);
+      border-radius: 20px;
+      box-shadow: 0 0 26px rgba(255,153,0,0.25);
+      padding: 28px 26px 22px;
+      text-align: center;
+    }
+
+    #end-box h1 {
+      margin: 0 0 18px;
+      font-size: clamp(2.2rem, 4vw, 4rem);
+      letter-spacing: 2px;
+    }
+
+    #end-box p {
+      margin: 0 0 18px;
+      font-family: Arial, sans-serif;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    #next-btn {
+      border: none;
+      background: var(--gold);
+      color: #111;
+      border-radius: 999px;
+      padding: 14px 28px;
+      font-size: 1.25rem;
+      cursor: pointer;
+      box-shadow: 0 10px 18px rgba(255,153,0,0.32);
+    }
+
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #222 0%, #060606 62%, #000 100%);
+      text-align: center;
+      padding: 20px;
+    }
+
+    #loading-screen h1 {
+      margin: 0 0 28px;
+      font-size: clamp(2.4rem, 4vw, 4.6rem);
+      letter-spacing: 4px;
+    }
+
+    .matchup {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 54px;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+    }
+
+    .team-card {
+      width: min(290px, 78vw);
+      background: rgba(255,255,255,0.04);
+      border: 3px solid var(--gold);
+      border-radius: 18px;
+      padding: 24px 18px;
+      box-shadow: 0 0 24px rgba(255,153,0,0.2);
+    }
+
+    .team-card.red { border-color: #ce1141; }
+    .team-title {
+      font-size: clamp(1.5rem, 2.2vw, 2.5rem);
+      letter-spacing: 2px;
+    }
+    .rating {
+      font-size: clamp(2.4rem, 3.2vw, 4rem);
+      color: var(--gold);
+      margin: 12px 0 8px;
+      font-style: italic;
+    }
+    .players {
+      font-family: Arial, sans-serif;
+      color: #d7d7d7;
+      line-height: 1.7;
+      font-size: 0.97rem;
+      text-align: left;
+      margin-left: 16px;
+    }
+    .versus {
+      font-size: clamp(2.2rem, 4vw, 3.6rem);
+      color: var(--gold);
+      opacity: 0.8;
+    }
+
+    #tipoff-btn {
+      border: none;
+      background: var(--gold);
+      color: #111;
+      font-size: clamp(1.1rem, 2vw, 1.8rem);
+      padding: 16px 38px;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 10px 18px rgba(255,153,0,0.28);
+    }
+
+    #intro-cinematic {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.88);
+      text-align: center;
+      padding: 20px;
+    }
+
+    #cinematic-text {
+      font-size: clamp(2.2rem, 5vw, 5.8rem);
+      color: var(--gold);
+      text-shadow: 0 0 14px rgba(255,153,0,0.5);
+      animation: pulse 1.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { transform: scale(0.94); opacity: 0.8; }
+      to { transform: scale(1.05); opacity: 1; }
+    }
+
+    @keyframes flash {
+      from { opacity: 1; }
+      to { opacity: 0.35; }
+    }
+  </style>
+</head>
+<body>
+  <div id="loading-screen">
+    <h1>NBA 2K27 LOADING...</h1>
+    <div class="matchup">
+      <div class="team-card">
+        <div class="team-title">WARRIORS</div>
+        <div class="rating">94 OVR</div>
+        <div class="players">
+          <strong>S. Curry (PG) - 97 OVR</strong><br />
+          B. Hield (SG) - 81 OVR<br />
+          A. Wiggins (SF) - 80 OVR<br />
+          D. Green (PF) - 83 OVR<br />
+          T. Jackson-Davis (C) - 78 OVR
+        </div>
+      </div>
+      <div class="versus">VS</div>
+      <div class="team-card red">
+        <div class="team-title">RAPTORS</div>
+        <div class="rating">84 OVR</div>
+        <div class="players">
+          I. Quickley (PG) - 82 OVR<br />
+          R. Barrett (SG) - 84 OVR<br />
+          S. Barnes (SF) - 87 OVR<br />
+          K. Olynyk (PF) - 78 OVR<br />
+          J. Poeltl (C) - 80 OVR
+        </div>
+      </div>
+    </div>
+    <button id="tipoff-btn" type="button">ADVANCE TO TIP-OFF</button>
+  </div>
+
+  <div id="intro-cinematic">
+    <div id="cinematic-text">WELCOME TO THE ARENA</div>
+  </div>
+
+  <div id="game-container">
+    <div id="canvas-wrap"></div>
+    <div id="graphics-error" role="alert"></div>
+
+    <div id="hud">WARRIORS 0 | 0 RAPTORS</div>
+    <div id="shot-clock" aria-label="24 second shot clock">24</div>
+
+    <div id="rules-panel">
+      <h2>Basketball Rules</h2>
+      <ul>
+        <li>Move with W, A, S, D.</li>
+        <li>Press Space to charge the shot meter.</li>
+        <li>Release inside the green window for a makes.</li>
+        <li>Any make inside the 3-point arc = 2, outside = 3.</li>
+        <li>Hold R and release in green to block a nearby CPU shot.</li>
+        <li>Press E to steal the ball. Press Q near the hoop to dunk.</li>
+        <li>First to 21 wins.</li>
+      </ul>
+    </div>
+
+    <div id="shot-meter">
+      <div class="meter-label">SHOT</div>
+      <div class="green-zone"></div>
+      <div class="meter-fill"></div>
+    </div>
+
+    <div id="block-meter">
+      <div class="meter-label">BLOCK</div>
+      <div class="green-zone"></div>
+      <div class="meter-fill"></div>
+    </div>
+
+    <div id="shot-status">GREEN LIGHT</div>
+
+    <div id="controls-hint">
+      <strong>CONTROLS:</strong><br />
+      Move: W A S D<br />
+      Shoot: HOLD SPACE<br />
+      Block: HOLD R<br />
+      Steal: E<br />
+      Dunk near hoop: Q
+    </div>
+  </div>
+
+  <div id="replay-overlay">
+    <div class="tag">2K INSTANT REPLAY</div>
+  </div>
+
+  <div id="end-screen">
+    <div id="end-box">
+      <h1 id="result-title">YOU WON</h1>
+      <p id="result-summary">Final score: 21 - 0</p>
+      <button id="next-btn" type="button">NEXT</button>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      player: { x: 0, z: 12, score: 0 },
+      cpu: { x: 0, z: 6, score: 0 },
+      ball: { x: 0, y: 1.2, z: 12 },
+      keys: {},
+      meterActive: false,
+      meterValue: 0,
+      meterDirection: 1,
+      blockMeterActive: false,
+      blockMeterValue: 0,
+      blockMeterDirection: 1,
+      blockActive: false,
+      blockProgress: 0,
+      blockDefender: '',
+      blockPosition: new THREE.Vector3(),
+      cpuShotCooldown: 1.5,
+      cpuBlockAttempted: false,
+      isBallInAir: false,
+      canShoot: true,
+      shotGreen: false,
+      shotValue: 2,
+      shotShooter: 'player',
+      possession: 'player',
+      possessionLine: 18,
+      possessionResetTimer: 0,
+      shotClock: 24,
+      shotHistory: [],
+      defenderDelay: 0,
+      shotAnimation: false,
+      shotPhase: '',
+      shotProgress: 0,
+      shotOrigin: new THREE.Vector3(),
+      shotEndpoint: new THREE.Vector3(),
+      dunkActive: false,
+      dunkPhase: '',
+      dunkProgress: 0,
+      dunkOrigin: new THREE.Vector3(),
+      dunkMade: true,
+      gameEnded: false,
+      replayActive: false,
+      replayTimer: 0,
+      replayFrames: [],
+      randomSeed: Math.random() * 1000,
+      lastActionStamp: 0,
+      lastStealAttempt: 0
+    };
+
+    let scene, camera, renderer;
+    let animationStarted = false;
+    let inputListenersAdded = false;
+    let playerMesh, cpuMesh, ballMesh, hoopGroup;
+    let playerRoot, cpuRoot;
+    let playerAnim = { leftLeg: null, rightLeg: null, leftArm: null, rightArm: null, torso: null };
+    let cpuAnim = { leftLeg: null, rightLeg: null, leftArm: null, rightArm: null, torso: null };
+    let courtBounds = { minX: -16, maxX: 16, minZ: -8, maxZ: 24 };
+
+    const greenMin = 62;
+    const greenMax = 86;
+    const winTarget = 21;
+
+    function startGameIntro() {
+      document.getElementById('tipoff-btn').addEventListener('click', () => {
+        document.getElementById('loading-screen').style.display = 'none';
+        const intro = document.getElementById('intro-cinematic');
+        const text = document.getElementById('cinematic-text');
+        intro.style.display = 'flex';
+
+        setTimeout(() => { text.textContent = 'THE TEAMS ARE WALKING OUT...'; }, 1000);
+        setTimeout(() => { text.textContent = 'STEPHEN CURRY IS WARMING UP...'; }, 2200);
+        setTimeout(() => { text.textContent = 'TIP-OFF'; }, 3400);
+        setTimeout(() => {
+          intro.style.display = 'none';
+          document.getElementById('game-container').style.display = 'block';
+          try {
+            initGame();
+          } catch (error) {
+            const message = document.getElementById('graphics-error');
+            message.textContent = `The game could not start its 3D graphics. Check that WebGL is enabled, then refresh. (${error.message})`;
+            message.style.display = 'flex';
+            console.error('Basketball game initialization failed:', error);
+          }
+        }, 4600);
+      });
+      document.getElementById('next-btn').addEventListener('click', () => {
+        restartGame();
+      });
+    }
+
+    function initGame() {
+      if (!scene) {
+        const container = document.getElementById('canvas-wrap');
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x070707);
+
+        camera = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 25, 48);
+        camera.lookAt(0, 0, -1);
+
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(container.clientWidth || window.innerWidth, container.clientHeight || window.innerHeight);
+        renderer.domElement.style.display = 'block';
+        renderer.domElement.style.width = '100%';
+        renderer.domElement.style.height = '100%';
+        container.appendChild(renderer.domElement);
+
+        const hemi = new THREE.HemisphereLight(0xffffff, 0x101010, 1.2);
+        scene.add(hemi);
+
+        const dir = new THREE.DirectionalLight(0xffffff, 1.1);
+        dir.position.set(12, 24, 14);
+        scene.add(dir);
+
+        createCourt();
+        createPlayer();
+        createCpu();
+        createHoop();
+        createBall();
+        createPossessionLine();
+      }
+
+      updateHud();
+      if (!animationStarted) {
+        animate();
+        animationStarted = true;
+      }
+      if (!inputListenersAdded) {
+        inputListenersAdded = true;
+        window.addEventListener('keydown', onKeyDown);
+        window.addEventListener('keyup', onKeyUp);
+        window.addEventListener('resize', onResize);
+      }
+    }
+
+    function createCourt() {
+      const floor = new THREE.Mesh(
+        new THREE.BoxGeometry(40, 0.2, 60),
+        new THREE.MeshStandardMaterial({ color: 0xc9955c, roughness: 0.82 })
+      );
+      floor.position.y = -0.1;
+      scene.add(floor);
+
+      const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+      const addCourtLine = (points, loop = false) => {
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        scene.add(loop ? new THREE.LineLoop(geometry, lineMaterial) : new THREE.Line(geometry, lineMaterial));
+      };
+
+      addCourtLine([
+        new THREE.Vector3(-20, 0.02, -30),
+        new THREE.Vector3(20, 0.02, -30),
+        new THREE.Vector3(20, 0.02, 30),
+        new THREE.Vector3(-20, 0.02, 30)
+      ], true);
+      addCourtLine([
+        new THREE.Vector3(-6, 0.03, -30),
+        new THREE.Vector3(-6, 0.03, -7.8),
+        new THREE.Vector3(6, 0.03, -7.8),
+        new THREE.Vector3(6, 0.03, -30)
+      ]);
+
+      const arcPoints = [];
+      for (let a = 0; a <= Math.PI; a += 0.07) {
+        const x = Math.cos(a) * 11.5;
+        const z = Math.sin(a) * 11.5 - 18;
+        arcPoints.push(new THREE.Vector3(x, 0.04, z));
+      }
+      const arc = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints(arcPoints),
+        lineMaterial
+      );
+      scene.add(arc);
+
+      addCourtLine([
+        new THREE.Vector3(-6, 0.04, -7.8),
+        new THREE.Vector3(6, 0.04, -7.8)
+      ]);
+    }
+
+    function createPlayer() {
+      playerRoot = new THREE.Group();
+      playerRoot.position.set(state.player.x, 0, state.player.z);
+      scene.add(playerRoot);
+
+      const jerseyMat = new THREE.MeshStandardMaterial({ color: 0x1d428a, roughness: 0.72 });
+      const skinMat = new THREE.MeshStandardMaterial({ color: 0xf1d1a1, roughness: 0.8 });
+      const shortMat = new THREE.MeshStandardMaterial({ color: 0x2d2d2d, roughness: 0.85 });
+      const shoeMat = new THREE.MeshStandardMaterial({ color: 0x171717, roughness: 0.8 });
+
+      const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.82, 2.2, 8, 12), jerseyMat);
+      torso.position.y = 2.9;
+      playerRoot.add(torso);
+      playerAnim.torso = torso;
+
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.56, 24, 20), skinMat);
+      head.position.y = 4.8;
+      playerRoot.add(head);
+
+      const leftArm = new THREE.Group();
+      leftArm.position.set(-1.06, 3.4, 0);
+      const leftUpperArm = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 1.0, 4, 8), jerseyMat);
+      leftUpperArm.position.y = -0.58;
+      leftArm.add(leftUpperArm);
+      playerRoot.add(leftArm);
+      playerAnim.leftArm = leftArm;
+
+      const rightArm = new THREE.Group();
+      rightArm.position.set(1.06, 3.4, 0);
+      const rightUpperArm = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 1.0, 4, 8), jerseyMat);
+      rightUpperArm.position.y = -0.58;
+      rightArm.add(rightUpperArm);
+      playerRoot.add(rightArm);
+      playerAnim.rightArm = rightArm;
+
+      const leftLeg = new THREE.Group();
+      leftLeg.position.set(-0.42, 1.4, 0);
+      const leftThigh = new THREE.Mesh(new THREE.CapsuleGeometry(0.25, 1.5, 4, 10), shortMat);
+      leftThigh.position.y = -0.8;
+      leftLeg.add(leftThigh);
+      const leftShin = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 1.2, 4, 10), skinMat);
+      leftShin.position.set(0, -2.05, 0.18);
+      leftLeg.add(leftShin);
+      const leftShoe = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 0.9), shoeMat);
+      leftShoe.position.set(0, -3.08, 0.28);
+      leftLeg.add(leftShoe);
+      playerRoot.add(leftLeg);
+      playerAnim.leftLeg = leftLeg;
+
+      const rightLeg = new THREE.Group();
+      rightLeg.position.set(0.42, 1.4, 0);
+      const rightThigh = new THREE.Mesh(new THREE.CapsuleGeometry(0.25, 1.5, 4, 10), shortMat);
+      rightThigh.position.y = -0.8;
+      rightLeg.add(rightThigh);
+      const rightShin = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 1.2, 4, 10), skinMat);
+      rightShin.position.set(0, -2.05, 0.18);
+      rightLeg.add(rightShin);
+      const rightShoe = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 0.9), shoeMat);
+      rightShoe.position.set(0, -3.08, 0.28);
+      rightLeg.add(rightShoe);
+      playerRoot.add(rightLeg);
+      playerAnim.rightLeg = rightLeg;
+    }
+
+    function createCpu() {
+      cpuRoot = new THREE.Group();
+      cpuRoot.position.set(state.cpu.x, 0, state.cpu.z);
+      scene.add(cpuRoot);
+
+      const jerseyMat = new THREE.MeshStandardMaterial({ color: 0xce1141, roughness: 0.72 });
+      const skinMat = new THREE.MeshStandardMaterial({ color: 0xf0c7a1, roughness: 0.8 });
+      const shortMat = new THREE.MeshStandardMaterial({ color: 0x2b2b2b, roughness: 0.9 });
+      const shoeMat = new THREE.MeshStandardMaterial({ color: 0x171717, roughness: 0.8 });
+
+      const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.8, 2.2, 8, 12), jerseyMat);
+      torso.position.y = 2.9;
+      cpuRoot.add(torso);
+      cpuAnim.torso = torso;
+
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.56, 20, 20), skinMat);
+      head.position.y = 4.8;
+      cpuRoot.add(head);
+
+      const leftArm = new THREE.Group();
+      leftArm.position.set(-1.06, 3.4, 0);
+      const leftUpperArm = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 1.0, 4, 8), jerseyMat);
+      leftUpperArm.position.y = -0.58;
+      leftArm.add(leftUpperArm);
+      cpuRoot.add(leftArm);
+      cpuAnim.leftArm = leftArm;
+
+      const rightArm = new THREE.Group();
+      rightArm.position.set(1.06, 3.4, 0);
+      const rightUpperArm = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 1.0, 4, 8), jerseyMat);
+      rightUpperArm.position.y = -0.58;
+      rightArm.add(rightUpperArm);
+      cpuRoot.add(rightArm);
+      cpuAnim.rightArm = rightArm;
+
+      const leftLeg = new THREE.Group();
+      leftLeg.position.set(-0.42, 1.4, 0);
+      const leftThigh = new THREE.Mesh(new THREE.CapsuleGeometry(0.24, 1.5, 4, 10), shortMat);
+      leftThigh.position.y = -0.8;
+      leftLeg.add(leftThigh);
+      const leftShin = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 1.2, 4, 10), skinMat);
+      leftShin.position.set(0, -2.05, 0.18);
+      leftLeg.add(leftShin);
+      const leftShoe = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 0.9), shoeMat);
+      leftShoe.position.set(0, -3.08, 0.28);
+      leftLeg.add(leftShoe);
+      cpuRoot.add(leftLeg);
+      cpuAnim.leftLeg = leftLeg;
+
+      const rightLeg = new THREE.Group();
+      rightLeg.position.set(0.42, 1.4, 0);
+      const rightThigh = new THREE.Mesh(new THREE.CapsuleGeometry(0.24, 1.5, 4, 10), shortMat);
+      rightThigh.position.y = -0.8;
+      rightLeg.add(rightThigh);
+      const rightShin = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 1.2, 4, 10), skinMat);
+      rightShin.position.set(0, -2.05, 0.18);
+      rightLeg.add(rightShin);
+      const rightShoe = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 0.9), shoeMat);
+      rightShoe.position.set(0, -3.08, 0.28);
+      rightLeg.add(rightShoe);
+      cpuRoot.add(rightLeg);
+      cpuAnim.rightLeg = rightLeg;
+    }
+
+    function createBall() {
+      const ballMat = new THREE.MeshStandardMaterial({ color: 0xff6a00, roughness: 0.6, metalness: 0.2 });
+      ballMesh = new THREE.Mesh(new THREE.SphereGeometry(0.5, 24, 24), ballMat);
+      ballMesh.position.set(state.ball.x, state.ball.y, state.ball.z);
+      scene.add(ballMesh);
+    }
+
+    function createHoop() {
+      hoopGroup = new THREE.Group();
+
+      const pole = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.2, 0.2, 9, 18),
+        new THREE.MeshStandardMaterial({ color: 0x4a4a4a, roughness: 0.7 })
+      );
+      pole.position.set(0, 4.5, -20);
+      hoopGroup.add(pole);
+
+      const backboardFrame = new THREE.Mesh(
+        new THREE.BoxGeometry(5.2, 3.2, 0.2),
+        new THREE.MeshStandardMaterial({ color: 0xeeeeee, metalness: 0.2, roughness: 0.32 })
+      );
+      backboardFrame.position.set(0, 7.2, -18.7);
+      hoopGroup.add(backboardFrame);
+
+      const glass = new THREE.Mesh(
+        new THREE.BoxGeometry(4.7, 2.7, 0.06),
+        new THREE.MeshPhysicalMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.38,
+          transmission: 0.6,
+          metalness: 0.1,
+          roughness: 0.15
+        })
+      );
+      glass.position.set(0, 7.2, -18.58);
+      hoopGroup.add(glass);
+
+      const rim = new THREE.Mesh(
+        new THREE.TorusGeometry(1.08, 0.08, 12, 26),
+        new THREE.MeshStandardMaterial({ color: 0xff3b2e, roughness: 0.45 })
+      );
+      rim.rotation.x = Math.PI / 2;
+      rim.position.set(0, 6.5, -17.8);
+      hoopGroup.add(rim);
+
+      const support = new THREE.Mesh(
+        new THREE.BoxGeometry(0.15, 5.2, 0.15),
+        new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.45 })
+      );
+      support.position.set(0, 3.8, -18.8);
+      hoopGroup.add(support);
+
+      const net = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.05, 1.2, 1.2, 18, 2, true),
+        new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.48, side: THREE.DoubleSide })
+      );
+      net.rotation.x = Math.PI / 2;
+      net.rotation.z = Math.PI / 2;
+      net.position.set(0, 4.7, -18.7);
+      hoopGroup.add(net);
+      hoopGroup.userData.net = net;
+
+      scene.add(hoopGroup);
+    }
+
+    function createPossessionLine() {
+      const linePoints = [
+        new THREE.Vector3(-16, 0.05, state.possessionLine),
+        new THREE.Vector3(16, 0.05, state.possessionLine)
+      ];
+      const line = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints(linePoints),
+        new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9 })
+      );
+      line.name = 'possessionLine';
+      scene.add(line);
+    }
+
+    function onResize() {
+      const container = document.getElementById('canvas-wrap');
+      const width = container.clientWidth || window.innerWidth;
+      const height = container.clientHeight || window.innerHeight;
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+    }
+
+    function onKeyDown(event) {
+      const key = event.key.toLowerCase();
+      state.keys[key] = true;
+
+      if (event.code === 'Space' && state.canShoot && state.possessionResetTimer <= 0 && !state.meterActive && !state.isBallInAir && !state.shotAnimation && !state.dunkActive && state.possession === 'player' && !state.gameEnded) {
+        startShotMeter();
+      }
+
+      if (key === 'e' && state.possession === 'cpu' && !state.gameEnded) {
+        attemptSteal();
+      }
+
+      if (key === 'q' && !event.repeat) {
+        startDunk();
+      }
+
+      if (key === 'r' && state.possession === 'cpu' && !state.gameEnded && !state.blockMeterActive) {
+        startBlockMeter();
+      }
+    }
+
+    function onKeyUp(event) {
+      const key = event.key.toLowerCase();
+      state.keys[key] = false;
+
+      if (event.code === 'Space' && state.meterActive) {
+        releaseShot();
+      }
+      if (key === 'r' && state.blockMeterActive) {
+        releaseBlockMeter();
+      }
+    }
+
+    function startShotMeter() {
+      state.meterActive = true;
+      state.meterValue = 0;
+      state.meterDirection = 1.8;
+      document.getElementById('shot-meter').style.display = 'block';
+      document.getElementById('shot-status').style.opacity = '0';
+    }
+
+    function releaseShot() {
+      const green = state.meterValue >= greenMin && state.meterValue <= greenMax;
+      state.meterActive = false;
+      document.getElementById('shot-meter').style.display = 'none';
+      launchShot('player', green);
+
+      const status = document.getElementById('shot-status');
+      status.textContent = green ? 'GREEN LIGHT' : 'MISSED';
+      status.style.color = green ? '#47ff78' : '#ff4a4a';
+      status.style.opacity = '1';
+      setTimeout(() => { status.style.opacity = '0'; }, 700);
+    }
+
+    function startBlockMeter() {
+      state.blockMeterActive = true;
+      state.blockMeterValue = 0;
+      state.blockMeterDirection = 1.8;
+      document.getElementById('block-meter').style.display = 'block';
+    }
+
+    function releaseBlockMeter() {
+      const green = state.blockMeterValue >= greenMin && state.blockMeterValue <= greenMax;
+      state.blockMeterActive = false;
+      document.getElementById('block-meter').style.display = 'none';
+      if (!state.shotAnimation || state.shotPhase !== 'flight' || state.shotShooter !== 'cpu') {
+        showActionStatus('WAIT FOR THE CPU SHOT', '#fff');
+        return;
+      }
+      if (!green) {
+        showActionStatus('BLOCK TIMING MISSED', '#ff4a4a');
+        return;
+      }
+      if (!tryBlock('player')) {
+        showActionStatus('TOO FAR OR OUT OF POSITION', '#ff4a4a');
+      }
+    }
+
+    function showActionStatus(text, color) {
+      const status = document.getElementById('shot-status');
+      status.textContent = text;
+      status.style.color = color;
+      status.style.opacity = '1';
+      setTimeout(() => { status.style.opacity = '0'; }, 900);
+    }
+
+    function launchShot(shooter, green) {
+      const player = shooter === 'player' ? state.player : state.cpu;
+      state.shotShooter = shooter;
+      state.shotGreen = green;
+      state.shotValue = getShotValue(shooter);
+      state.shotOrigin.set(player.x + 0.65, 4.15, player.z - 0.45);
+      state.shotEndpoint.set(green ? 0 : (state.shotOrigin.x >= 0 ? 2.3 : -2.3), 6.35, -17.8);
+      state.shotProgress = 0;
+      state.shotPhase = 'flight';
+      state.shotAnimation = true;
+      state.isBallInAir = true;
+      state.cpuBlockAttempted = false;
+      ballMesh.position.copy(state.shotOrigin);
+      state.canShoot = false;
+    }
+
+    function startDunk() {
+      if (state.gameEnded || state.possessionResetTimer > 0 || state.possession !== 'player' || !state.canShoot || state.meterActive || state.shotAnimation || state.dunkActive) return;
+      const distance = Math.hypot(state.player.x, state.player.z + 17.8);
+      if (distance > 5.5 || state.player.z <= -17.3) {
+        const status = document.getElementById('shot-status');
+        status.textContent = 'GET CLOSER TO THE HOOP';
+        status.style.color = '#fff';
+        status.style.opacity = '1';
+        setTimeout(() => { status.style.opacity = '0'; }, 700);
+        return;
+      }
+
+      state.dunkActive = true;
+      state.dunkPhase = 'flight';
+      state.dunkProgress = 0;
+      const defenderDistance = Math.hypot(state.cpu.x - state.player.x, state.cpu.z - state.player.z);
+      state.dunkMade = defenderDistance > 3.2 || Math.random() >= 0.45;
+      state.dunkOrigin.set(state.player.x + 0.65, 1.6, state.player.z - 0.45);
+      ballMesh.position.copy(state.dunkOrigin);
+      state.canShoot = false;
+    }
+
+    function getShotValue(shooter = 'player') {
+      const player = shooter === 'player' ? state.player : state.cpu;
+      const distance = Math.hypot(player.x, player.z + 18);
+      return distance > 11.5 ? 3 : 2;
+    }
+
+    function animate() {
+      const now = performance.now();
+      const deltaSeconds = Math.min((now - (state.lastFrameTime ?? now)) / 1000, 0.1);
+      state.lastFrameTime = now;
+      const t = now * 0.01;
+
+      if (!state.gameEnded) {
+        updateShotClock(deltaSeconds);
+        updatePlayerMovement();
+        updateCpuLogic(t);
+        animateCharacterPose(t);
+        updateShotMeter();
+        updateBlockMeter();
+      }
+
+      updateBallAndShot();
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+
+    function updateShotClock(deltaSeconds) {
+      if (state.shotAnimation || state.dunkActive || state.possessionResetTimer > 0 || state.gameEnded) return;
+      state.shotClock = Math.max(0, state.shotClock - deltaSeconds);
+      document.getElementById('shot-clock').textContent = String(Math.ceil(state.shotClock));
+      if (state.shotClock === 0) {
+        const nextPossession = state.possession === 'player' ? 'cpu' : 'player';
+        awardPossession(nextPossession);
+        const status = document.getElementById('shot-status');
+        status.textContent = '24 SECOND VIOLATION';
+        status.style.color = '#ff4a4a';
+        status.style.opacity = '1';
+        setTimeout(() => { status.style.opacity = '0'; }, 1000);
+      }
+    }
+
+    function updatePlayerMovement() {
+      const moving = state.keys['w'] || state.keys['s'] || state.keys['a'] || state.keys['d'];
+      const speed = moving && state.possessionResetTimer <= 0 && !state.dunkActive && !state.shotAnimation && !state.blockActive ? 0.24 : 0;
+
+      if (state.keys['w']) state.player.z -= speed;
+      if (state.keys['s']) state.player.z += speed;
+      if (state.keys['a']) state.player.x -= speed;
+      if (state.keys['d']) state.player.x += speed;
+
+      state.player.x = THREE.MathUtils.clamp(state.player.x, -15.8, 15.8);
+      state.player.z = THREE.MathUtils.clamp(state.player.z, -16.8, 24);
+      playerRoot.position.set(state.player.x, 0, state.player.z);
+
+      if (moving && Math.random() < 0.008) {
+        state.defenderDelay = 0.8 + Math.random() * 1.4;
+      }
+
+      if (state.possession === 'player') {
+        state.ball.x = state.player.x + 0.8;
+        state.ball.z = state.player.z - 0.7;
+      }
+    }
+
+    function updateCpuLogic(t) {
+      if (state.defenderDelay > 0) {
+        state.defenderDelay -= 0.016;
+      }
+
+      if (state.possessionResetTimer > 0) {
+        state.possessionResetTimer = Math.max(0, state.possessionResetTimer - 0.016);
+        cpuRoot.position.set(state.cpu.x, 0, state.cpu.z);
+        return;
+      }
+
+      if (state.possession === 'cpu') {
+        state.cpuShotCooldown = Math.max(0, state.cpuShotCooldown - 0.016);
+        moveCpuToward(0, -17.8, 0.24);
+        state.cpu.x = THREE.MathUtils.clamp(state.cpu.x, -15.8, 15.8);
+        state.cpu.z = THREE.MathUtils.clamp(state.cpu.z, -16.8, 24);
+        state.ball.x = state.cpu.x + 0.2;
+        state.ball.z = state.cpu.z - 0.8;
+
+        const shotRange = Math.hypot(state.cpu.x, state.cpu.z + 18);
+        if (shotRange < 12 && state.cpuShotCooldown <= 0 && !state.isBallInAir && !state.shotAnimation) {
+          state.cpuShotCooldown = 2.5;
+          launchShot('cpu', Math.random() < 0.62);
+        }
+      } else {
+        const towardHoopX = -state.player.x;
+        const towardHoopZ = -17.8 - state.player.z;
+        const hoopDistance = Math.hypot(towardHoopX, towardHoopZ) || 1;
+        const guardDistance = Math.min(3.2, hoopDistance * 0.55);
+        const guardX = state.player.x + towardHoopX / hoopDistance * guardDistance;
+        const guardZ = state.player.z + towardHoopZ / hoopDistance * guardDistance;
+        const guardSpeed = state.defenderDelay > 0 ? 0.17 : 0.23;
+        moveCpuToward(guardX, guardZ, guardSpeed);
+        state.cpu.x = THREE.MathUtils.clamp(state.cpu.x, -15.8, 15.8);
+        state.cpu.z = THREE.MathUtils.clamp(state.cpu.z, -16.8, 24);
+      }
+
+      cpuRoot.position.set(state.cpu.x, 0, state.cpu.z);
+    }
+
+    function moveCpuToward(targetX, targetZ, speed) {
+      const dx = targetX - state.cpu.x;
+      const dz = targetZ - state.cpu.z;
+      const distance = Math.hypot(dx, dz);
+      if (distance <= speed || distance === 0) {
+        state.cpu.x = targetX;
+        state.cpu.z = targetZ;
+        return;
+      }
+      state.cpu.x += dx / distance * speed;
+      state.cpu.z += dz / distance * speed;
+    }
+
+    function animateCharacterPose(t) {
+      const playerMoving = state.keys['w'] || state.keys['s'] || state.keys['a'] || state.keys['d'];
+      const playerWalk = playerMoving ? Math.sin(t * 5.2) * 0.5 : 0;
+      const cpuWalk = state.possession === 'cpu' ? Math.sin(t * 5.2) * 0.55 : Math.sin(t * 4) * 0.2;
+
+      playerAnim.leftLeg.rotation.x = playerMoving ? playerWalk : 0;
+      playerAnim.rightLeg.rotation.x = playerMoving ? -playerWalk : 0;
+      playerAnim.leftArm.rotation.x = playerMoving ? -playerWalk * 0.9 : 0;
+      playerAnim.rightArm.rotation.x = playerMoving ? playerWalk * 0.9 : 0;
+      playerAnim.torso.rotation.x = playerMoving ? 0.12 : 0;
+      playerAnim.torso.rotation.z = -state.player.x * 0.03;
+      playerAnim.torso.rotation.y = -Math.atan2(
+        (state.keys['d'] ? 1 : 0) - (state.keys['a'] ? 1 : 0),
+        (state.keys['s'] ? 1 : 0) - (state.keys['w'] ? 1 : 0)
+      );
+
+      cpuAnim.leftLeg.rotation.x = cpuWalk;
+      cpuAnim.rightLeg.rotation.x = -cpuWalk;
+      cpuAnim.leftArm.rotation.x = -cpuWalk * 0.85;
+      cpuAnim.rightArm.rotation.x = cpuWalk * 0.85;
+      cpuAnim.torso.rotation.x = state.possession === 'cpu' ? 0.08 : 0;
+      cpuAnim.torso.rotation.z = -state.cpu.x * 0.02;
+    }
+
+    function updateShotMeter() {
+      if (!state.meterActive) return;
+      state.meterValue += state.meterDirection * 2.7;
+      if (state.meterValue >= 100 || state.meterValue <= 0) {
+        state.meterDirection *= -1;
+        state.meterValue = THREE.MathUtils.clamp(state.meterValue, 0, 100);
+      }
+      document.querySelector('#shot-meter .meter-fill').style.height = state.meterValue + '%';
+    }
+
+    function updateBlockMeter() {
+      if (!state.blockMeterActive) return;
+      state.blockMeterValue += state.blockMeterDirection * 2.7;
+      if (state.blockMeterValue >= 100 || state.blockMeterValue <= 0) {
+        state.blockMeterDirection *= -1;
+        state.blockMeterValue = THREE.MathUtils.clamp(state.blockMeterValue, 0, 100);
+      }
+      document.querySelector('#block-meter .meter-fill').style.height = state.blockMeterValue + '%';
+    }
+
+    function tryBlock(defender) {
+      if (!state.shotAnimation || state.shotPhase !== 'flight') return false;
+      const shooter = state.shotShooter === 'player' ? state.player : state.cpu;
+      const blocker = defender === 'player' ? state.player : state.cpu;
+      const isOpponentShot = (defender === 'player' && state.shotShooter === 'cpu')
+        || (defender === 'cpu' && state.shotShooter === 'player');
+      const distance = Math.hypot(blocker.x - shooter.x, blocker.z - shooter.z);
+      const inFront = blocker.z < shooter.z + 1.5;
+      if (!isOpponentShot || distance > 4.2 || !inFront) return false;
+
+      state.blockActive = true;
+      state.blockProgress = 0;
+      state.blockDefender = defender;
+      state.blockPosition.set(blocker.x + 0.55, 5.2, blocker.z - 0.35);
+      state.shotAnimation = false;
+      state.shotPhase = '';
+      state.shotGreen = false;
+      state.isBallInAir = false;
+      ballMesh.position.copy(state.blockPosition);
+      showActionStatus('BLOCKED!', '#47ff78');
+      return true;
+    }
+
+    function updateBallAndShot() {
+      if (state.blockActive) {
+        state.blockProgress = Math.min(state.blockProgress + 0.045, 1);
+        const jump = Math.sin(state.blockProgress * Math.PI) * 2.1;
+        const blockerRoot = state.blockDefender === 'player' ? playerRoot : cpuRoot;
+        blockerRoot.position.y = jump;
+        ballMesh.position.copy(state.blockPosition);
+        if (state.blockProgress >= 1) {
+          blockerRoot.position.y = 0;
+          const winner = state.blockDefender;
+          state.blockActive = false;
+          state.blockDefender = '';
+          state.blockProgress = 0;
+          state.canShoot = true;
+          awardPossession(winner);
+        }
+        return;
+      }
+
+      if (state.dunkActive) {
+        state.dunkProgress = Math.min(state.dunkProgress + 0.035, 1);
+        const p = state.dunkProgress;
+        if (state.dunkPhase === 'flight') {
+          playerRoot.position.y = Math.sin(Math.PI * p) * 2.2;
+          ballMesh.position.x = THREE.MathUtils.lerp(state.dunkOrigin.x, 0, p);
+          ballMesh.position.z = THREE.MathUtils.lerp(state.dunkOrigin.z, -17.8, p);
+          ballMesh.position.y = THREE.MathUtils.lerp(state.dunkOrigin.y, 6.35, p) + 1.4 * 4 * p * (1 - p);
+          ballMesh.rotation.x += 0.14;
+          if (p >= 1) {
+            if (state.dunkMade) {
+              state.player.score += 2;
+              updateHud();
+              if (Math.random() < 0.8) showReplay();
+              checkWinCondition();
+              state.dunkPhase = 'net';
+              ballMesh.position.set(0, 6.35, -17.8);
+            } else {
+              showActionStatus('CONTESTED DUNK MISSED', '#ff4a4a');
+              state.dunkPhase = 'miss';
+              ballMesh.position.set(1.8, 6.35, -17.8);
+            }
+            state.dunkProgress = 0;
+          }
+        } else if (state.dunkPhase === 'net') {
+          playerRoot.position.y = 0;
+          ballMesh.position.set(0, THREE.MathUtils.lerp(6.35, 4.25, p), -17.8);
+          ballMesh.rotation.x += 0.1;
+          if (p >= 1) {
+            state.dunkActive = false;
+            state.dunkPhase = '';
+            state.dunkProgress = 0;
+            state.canShoot = true;
+            awardPossession('cpu');
+          }
+        } else {
+          playerRoot.position.y = Math.sin(Math.PI * p) * 1.2;
+          ballMesh.position.x = THREE.MathUtils.lerp(1.8, 2.4, p);
+          ballMesh.position.y = THREE.MathUtils.lerp(6.35, 0.5, p);
+          ballMesh.position.z = THREE.MathUtils.lerp(-17.8, -16.4, p);
+          ballMesh.rotation.x += 0.14;
+          if (p >= 1) {
+            playerRoot.position.y = 0;
+            state.dunkActive = false;
+            state.dunkPhase = '';
+            state.dunkProgress = 0;
+            state.canShoot = true;
+            awardPossession('cpu');
+          }
+        }
+        return;
+      }
+
+      if (state.shotAnimation) {
+        state.shotProgress = Math.min(state.shotProgress + 0.018, 1);
+        const p = state.shotProgress;
+
+        if (state.shotPhase === 'flight') {
+          if (state.shotShooter === 'player' && !state.cpuBlockAttempted) {
+            const cpuDistance = Math.hypot(state.cpu.x - state.player.x, state.cpu.z - state.player.z);
+            if (state.shotProgress >= 0.2 && cpuDistance <= 4.2) {
+              state.cpuBlockAttempted = true;
+              if (Math.random() < 0.58 && tryBlock('cpu')) return;
+            }
+          }
+          ballMesh.position.x = THREE.MathUtils.lerp(state.shotOrigin.x, state.shotEndpoint.x, p);
+          ballMesh.position.z = THREE.MathUtils.lerp(state.shotOrigin.z, state.shotEndpoint.z, p);
+          ballMesh.position.y = THREE.MathUtils.lerp(state.shotOrigin.y, state.shotEndpoint.y, p) + 5.8 * 4 * p * (1 - p);
+          ballMesh.rotation.x += 0.14;
+          ballMesh.rotation.z += 0.1;
+
+          if (p >= 1) {
+            if (state.shotGreen) {
+              scoreShot();
+              state.shotPhase = 'net';
+              state.shotProgress = 0;
+              ballMesh.position.set(0, 6.35, -17.8);
+            } else {
+              state.shotPhase = 'miss';
+              state.shotProgress = 0;
+              state.shotOrigin.copy(ballMesh.position);
+            }
+          }
+        } else if (state.shotPhase === 'net') {
+          ballMesh.position.set(0, THREE.MathUtils.lerp(6.35, 4.25, p), -17.8);
+          ballMesh.rotation.x += 0.1;
+          if (p >= 1) {
+            endShotAnimation(state.shotShooter === 'player' ? 'cpu' : 'player');
+          }
+        } else if (state.shotPhase === 'miss') {
+          ballMesh.position.x = state.shotOrigin.x + Math.sin(p * Math.PI) * 0.35;
+          ballMesh.position.y = THREE.MathUtils.lerp(state.shotOrigin.y, 0.5, p);
+          ballMesh.position.z = state.shotOrigin.z + p * 0.5;
+          ballMesh.rotation.x += 0.14;
+          if (p >= 1) {
+            resetAfterMiss();
+          }
+        }
+        return;
+      }
+
+      if (state.possession === 'player' && !state.isBallInAir) {
+        const walkPulse = (state.keys['w'] || state.keys['s'] || state.keys['a'] || state.keys['d']) ? Math.abs(Math.sin(performance.now() * 0.012)) * 0.75 : 0;
+        ballMesh.position.set(state.player.x + 0.8, 1.25 + walkPulse, state.player.z - 0.7);
+        return;
+      }
+
+      if (state.possession === 'cpu' && !state.isBallInAir) {
+        ballMesh.position.set(state.cpu.x + 0.3, 1.25 + Math.abs(Math.sin(performance.now() * 0.012)) * 0.7, state.cpu.z - 0.7);
+        return;
+      }
+
+    }
+
+    function scoreShot() {
+      if (state.shotShooter === 'player') {
+        state.player.score += state.shotValue;
+      } else {
+        state.cpu.score += state.shotValue;
+      }
+      state.isBallInAir = false;
+      state.shotGreen = false;
+      updateHud();
+      if (Math.random() < 0.8) showReplay();
+      checkWinCondition();
+    }
+
+    function endShotAnimation(nextPossession) {
+      state.shotAnimation = false;
+      state.shotPhase = '';
+      state.shotProgress = 0;
+      state.isBallInAir = false;
+      state.canShoot = true;
+      awardPossession(nextPossession);
+    }
+
+    function resetAfterMiss() {
+      state.isBallInAir = false;
+      state.shotAnimation = false;
+      state.shotPhase = '';
+      state.shotProgress = 0;
+      state.canShoot = true;
+      state.meterActive = false;
+      state.shotGreen = false;
+      state.blockMeterActive = false;
+      state.blockActive = false;
+      state.blockProgress = 0;
+      document.getElementById('shot-meter').style.display = 'none';
+      document.getElementById('block-meter').style.display = 'none';
+      document.querySelector('#shot-meter .meter-fill').style.height = '0%';
+      document.querySelector('#block-meter .meter-fill').style.height = '0%';
+      awardPossession(state.shotShooter === 'player' ? 'cpu' : 'player');
+    }
+
+    function awardPossession(recipient) {
+      state.possession = recipient;
+      const receiver = recipient === 'player' ? state.player : state.cpu;
+      const opponent = recipient === 'player' ? state.cpu : state.player;
+      receiver.x = 0;
+      receiver.z = state.possessionLine + 3;
+      opponent.x = recipient === 'player' ? 3 : -3;
+      opponent.z = state.possessionLine + 5;
+      state.possessionResetTimer = 1.2;
+      state.shotClock = 24;
+      state.cpuShotCooldown = 1.5;
+      document.getElementById('shot-clock').textContent = '24';
+      playerRoot.position.set(state.player.x, 0, state.player.z);
+      cpuRoot.position.set(state.cpu.x, 0, state.cpu.z);
+      state.ball.x = receiver.x + 0.8;
+      state.ball.y = 1.3;
+      state.ball.z = receiver.z - 0.7;
+      ballMesh.position.set(state.ball.x, state.ball.y, state.ball.z);
+    }
+
+    function showReplay() {
+      const overlay = document.getElementById('replay-overlay');
+      overlay.style.display = 'block';
+      clearTimeout(showReplay.timeoutId);
+      showReplay.timeoutId = setTimeout(() => {
+        overlay.style.display = 'none';
+      }, 1200);
+    }
+
+    function updateHud() {
+      document.getElementById('hud').textContent = `WARRIORS ${state.player.score} | ${state.cpu.score} RAPTORS`;
+      document.getElementById('hud').style.color = '#fff';
+    }
+
+    function attemptSteal() {
+      if (state.gameEnded || state.possession !== 'cpu') return;
+      const dx = state.player.x - state.cpu.x;
+      const dz = state.player.z - state.cpu.z;
+      const dist = Math.hypot(dx, dz);
+      if (dist > 2.2) return;
+
+      const success = Math.random() < 0.74;
+      if (success) {
+        awardPossession('player');
+        return;
+      }
+
+      const status = document.getElementById('shot-status');
+      status.textContent = 'STEAL FAILED';
+      status.style.color = '#ff4a4a';
+      status.style.opacity = '1';
+      setTimeout(() => { status.style.opacity = '0'; }, 700);
+    }
+
+    function checkWinCondition() {
+      if (state.player.score >= winTarget || state.cpu.score >= winTarget) {
+        finishGame();
+      }
+    }
+
+    function finishGame() {
+      state.gameEnded = true;
+      const result = state.player.score > state.cpu.score ? 'YOU WON' : 'YOU LOST';
+      const summary = `Final score: ${state.player.score} - ${state.cpu.score}`;
+      document.getElementById('result-title').textContent = result;
+      document.getElementById('result-summary').textContent = summary;
+      document.getElementById('end-screen').style.display = 'flex';
+    }
+
+    function restartGame() {
+      state.player.score = 0;
+      state.cpu.score = 0;
+      state.possession = 'player';
+      state.possessionResetTimer = 0;
+      state.shotClock = 24;
+      state.cpuShotCooldown = 1.5;
+      state.lastFrameTime = performance.now();
+      state.player.x = 0;
+      state.player.z = 12;
+      state.cpu.x = 0;
+      state.cpu.z = 6;
+      state.isBallInAir = false;
+      state.meterActive = false;
+      state.shotGreen = false;
+      state.shotAnimation = false;
+      state.shotPhase = '';
+      state.shotProgress = 0;
+      state.dunkActive = false;
+      state.dunkPhase = '';
+      state.dunkProgress = 0;
+      playerRoot.position.y = 0;
+      state.blockMeterActive = false;
+      state.blockActive = false;
+      state.blockProgress = 0;
+      state.blockDefender = '';
+      state.defenderDelay = 0;
+      state.isBallInAir = false;
+      state.canShoot = true;
+      state.gameEnded = false;
+      document.getElementById('end-screen').style.display = 'none';
+      document.getElementById('loading-screen').style.display = 'flex';
+      document.getElementById('game-container').style.display = 'none';
+      document.getElementById('replay-overlay').style.display = 'none';
+      document.getElementById('shot-meter').style.display = 'none';
+      document.getElementById('block-meter').style.display = 'none';
+      document.querySelector('#shot-meter .meter-fill').style.height = '0%';
+      document.querySelector('#block-meter .meter-fill').style.height = '0%';
+      ballMesh.position.set(0.8, 1.3, 11.3);
+      document.getElementById('shot-clock').textContent = '24';
+      updateHud();
+    }
+
+    startGameIntro();
+  </script>
+</body>
+</html>
