@@ -417,7 +417,7 @@
         <li>Release inside the green window for a makes.</li>
         <li>Any make inside the 3-point arc = 2, outside = 3.</li>
         <li>Hold R and release in green to block a nearby CPU shot.</li>
-        <li>Press E to steal the ball. Press Q near the hoop to dunk.</li>
+        <li>Press E to steal the ball. Press Q near the hoop for a dunk or layup.</li>
         <li>First to 21 wins.</li>
       </ul>
     </div>
@@ -442,7 +442,7 @@
       Shoot: HOLD SPACE<br />
       Block: HOLD R<br />
       Steal: E<br />
-      Dunk near hoop: Q
+      Finish near hoop: Q (layup / dunk)
     </div>
   </div>
 
@@ -497,6 +497,7 @@
       dunkProgress: 0,
       dunkOrigin: new THREE.Vector3(),
       dunkMade: true,
+      dunkType: '',
       gameEnded: false,
       replayActive: false,
       replayTimer: 0,
@@ -513,8 +514,9 @@
     let playerRoot, cpuRoot;
     let playerAnim = { leftLeg: null, rightLeg: null, leftArm: null, rightArm: null, torso: null };
     let cpuAnim = { leftLeg: null, rightLeg: null, leftArm: null, rightArm: null, torso: null };
-    let courtBounds = { minX: -16, maxX: 16, minZ: -8, maxZ: 24 };
+    let courtBounds = { minX: -16, maxX: 16, minZ: -28.8, maxZ: 24 };
 
+    const hoopZ = -26.65;
     const greenMin = 62;
     const greenMax = 86;
     const winTarget = 21;
@@ -573,6 +575,7 @@
         scene.add(dir);
 
         createCourt();
+        createCrowd();
         createPlayer();
         createCpu();
         createHoop();
@@ -594,8 +597,15 @@
     }
 
     function createCourt() {
+      const arenaFloor = new THREE.Mesh(
+        new THREE.BoxGeometry(68, 0.24, 88),
+        new THREE.MeshStandardMaterial({ color: 0x191a1d, roughness: 0.92 })
+      );
+      arenaFloor.position.y = -0.23;
+      scene.add(arenaFloor);
+
       const floor = new THREE.Mesh(
-        new THREE.BoxGeometry(40, 0.2, 60),
+        new THREE.BoxGeometry(32, 0.2, 60),
         new THREE.MeshStandardMaterial({ color: 0xc9955c, roughness: 0.82 })
       );
       floor.position.y = -0.1;
@@ -608,22 +618,22 @@
       };
 
       addCourtLine([
-        new THREE.Vector3(-20, 0.02, -30),
-        new THREE.Vector3(20, 0.02, -30),
-        new THREE.Vector3(20, 0.02, 30),
-        new THREE.Vector3(-20, 0.02, 30)
+        new THREE.Vector3(-16, 0.02, -30),
+        new THREE.Vector3(16, 0.02, -30),
+        new THREE.Vector3(16, 0.02, 30),
+        new THREE.Vector3(-16, 0.02, 30)
       ], true);
       addCourtLine([
-        new THREE.Vector3(-6, 0.03, -30),
-        new THREE.Vector3(-6, 0.03, -7.8),
-        new THREE.Vector3(6, 0.03, -7.8),
-        new THREE.Vector3(6, 0.03, -30)
+        new THREE.Vector3(-5.2, 0.03, -30),
+        new THREE.Vector3(-5.2, 0.03, -17.1),
+        new THREE.Vector3(-5.2, 0.03, -17.1),
+        new THREE.Vector3(5.2, 0.03, -17.1),
       ]);
 
       const arcPoints = [];
       for (let a = 0; a <= Math.PI; a += 0.07) {
-        const x = Math.cos(a) * 11.5;
-        const z = Math.sin(a) * 11.5 - 18;
+        const x = Math.cos(a) * 15.2;
+        const z = Math.sin(a) * 15.2 + hoopZ;
         arcPoints.push(new THREE.Vector3(x, 0.04, z));
       }
       const arc = new THREE.Line(
@@ -633,9 +643,82 @@
       scene.add(arc);
 
       addCourtLine([
-        new THREE.Vector3(-6, 0.04, -7.8),
-        new THREE.Vector3(6, 0.04, -7.8)
+        new THREE.Vector3(-5.2, 0.04, -17.1),
+        new THREE.Vector3(5.2, 0.04, -17.1)
       ]);
+    }
+
+    function createCrowd() {
+      const jerseyColors = [0x24467a, 0xce1141, 0xd5d0c4, 0x426b52, 0x9a653d, 0x3c3c45];
+      const spectatorsByColor = jerseyColors.map(() => []);
+      const headPositions = [];
+      const addSpectator = (x, y, z, index) => {
+        spectatorsByColor[index % jerseyColors.length].push([x, y, z]);
+        headPositions.push([x, y + 0.82, z]);
+      };
+
+      for (let row = 0; row < 5; row += 1) {
+        const rise = row * 0.52;
+        for (const side of [-1, 1]) {
+          const stand = new THREE.Mesh(
+            new THREE.BoxGeometry(1.05, 0.26, 54),
+            new THREE.MeshStandardMaterial({ color: 0x303136, roughness: 0.88 })
+          );
+          stand.position.set(side * (17.4 + row * 1.15), 0.25 + rise, 0);
+          scene.add(stand);
+
+          for (let seat = 0; seat < 35; seat += 1) {
+            const z = -25 + seat * 1.48;
+            const index = row * 97 + seat * 2 + (side > 0 ? 1 : 0);
+            addSpectator(side * (17.4 + row * 1.15), 0.98 + rise, z, index);
+          }
+        }
+
+        for (const end of [-1, 1]) {
+          const stand = new THREE.Mesh(
+            new THREE.BoxGeometry(37, 0.26, 1.05),
+            new THREE.MeshStandardMaterial({ color: 0x303136, roughness: 0.88 })
+          );
+          stand.position.set(0, 0.25 + rise, end * (31.4 + row * 1.15));
+          scene.add(stand);
+
+          for (let seat = 0; seat < 25; seat += 1) {
+            const x = -18 + seat * 1.5;
+            const index = 700 + row * 73 + seat * 2 + (end > 0 ? 1 : 0);
+            addSpectator(x, 0.98 + rise, end * (31.4 + row * 1.15), index);
+          }
+        }
+      }
+
+      const bodyGeometry = new THREE.CapsuleGeometry(0.31, 0.72, 3, 7);
+      const headGeometry = new THREE.SphereGeometry(0.27, 8, 6);
+      const headMaterial = new THREE.MeshStandardMaterial({ color: 0xc99572, roughness: 0.9 });
+      const headCrowd = new THREE.InstancedMesh(headGeometry, headMaterial, headPositions.length);
+      const transform = new THREE.Object3D();
+
+      headPositions.forEach(([x, y, z], index) => {
+        transform.position.set(x, y, z);
+        transform.updateMatrix();
+        headCrowd.setMatrixAt(index, transform.matrix);
+      });
+      headCrowd.instanceMatrix.needsUpdate = true;
+      scene.add(headCrowd);
+
+      spectatorsByColor.forEach((positions, color) => {
+        const bodies = new THREE.InstancedMesh(
+          bodyGeometry,
+          new THREE.MeshStandardMaterial({ color: jerseyColors[color], roughness: 0.84 }),
+          positions.length
+        );
+        positions.forEach(([x, y, z], index) => {
+          transform.position.set(x, y, z);
+          transform.rotation.y = (index % 3 - 1) * 0.12;
+          transform.updateMatrix();
+          bodies.setMatrixAt(index, transform.matrix);
+        });
+        bodies.instanceMatrix.needsUpdate = true;
+        scene.add(bodies);
+      });
     }
 
     function createPlayer() {
@@ -651,6 +734,7 @@
       const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.82, 2.2, 8, 12), jerseyMat);
       torso.position.y = 2.9;
       playerRoot.add(torso);
+      addJerseyMarking(playerRoot, 'WARRIORS', '30');
       playerAnim.torso = torso;
 
       const head = new THREE.Mesh(new THREE.SphereGeometry(0.56, 24, 20), skinMat);
@@ -715,6 +799,7 @@
       const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.8, 2.2, 8, 12), jerseyMat);
       torso.position.y = 2.9;
       cpuRoot.add(torso);
+      addJerseyMarking(cpuRoot, 'RAPTORS', '4');
       cpuAnim.torso = torso;
 
       const head = new THREE.Mesh(new THREE.SphereGeometry(0.56, 20, 20), skinMat);
@@ -766,6 +851,36 @@
       cpuAnim.rightLeg = rightLeg;
     }
 
+    function addJerseyMarking(root, team, number) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 320;
+      const context = canvas.getContext('2d');
+      if (context === null) return;
+
+      context.textAlign = 'center';
+      context.lineJoin = 'round';
+      context.strokeStyle = '#17202b';
+      context.fillStyle = '#ffffff';
+      context.font = 'bold 28px Arial';
+      context.lineWidth = 7;
+      context.strokeText(team, 128, 58);
+      context.fillText(team, 128, 58);
+      context.font = 'bold 150px Arial Black, Arial';
+      context.lineWidth = 10;
+      context.strokeText(number, 128, 230);
+      context.fillText(number, 128, 230);
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      const marking = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.22, 1.5),
+        new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide })
+      );
+      marking.position.set(0, 2.95, 0.84);
+      root.add(marking);
+    }
+
     function createBall() {
       const ballMat = new THREE.MeshStandardMaterial({ color: 0xff6a00, roughness: 0.6, metalness: 0.2 });
       ballMesh = new THREE.Mesh(new THREE.SphereGeometry(0.5, 24, 24), ballMat);
@@ -775,6 +890,7 @@
 
     function createHoop() {
       hoopGroup = new THREE.Group();
+      hoopGroup.position.z = hoopZ + 17.8;
 
       const pole = new THREE.Mesh(
         new THREE.CylinderGeometry(0.2, 0.2, 9, 18),
@@ -946,7 +1062,7 @@
       state.shotGreen = green;
       state.shotValue = getShotValue(shooter);
       state.shotOrigin.set(player.x + 0.65, 4.15, player.z - 0.45);
-      state.shotEndpoint.set(green ? 0 : (state.shotOrigin.x >= 0 ? 2.3 : -2.3), 6.35, -17.8);
+      state.shotEndpoint.set(green ? 0 : (state.shotOrigin.x >= 0 ? 2.3 : -2.3), 6.35, hoopZ);
       state.shotProgress = 0;
       state.shotPhase = 'flight';
       state.shotAnimation = true;
@@ -958,8 +1074,8 @@
 
     function startDunk() {
       if (state.gameEnded || state.possessionResetTimer > 0 || state.possession !== 'player' || !state.canShoot || state.meterActive || state.shotAnimation || state.dunkActive) return;
-      const distance = Math.hypot(state.player.x, state.player.z + 17.8);
-      if (distance > 5.5 || state.player.z <= -17.3) {
+      const distance = Math.hypot(state.player.x, state.player.z - hoopZ);
+      if (distance > 9.5 || state.player.z <= hoopZ + 0.5) {
         const status = document.getElementById('shot-status');
         status.textContent = 'GET CLOSER TO THE HOOP';
         status.style.color = '#fff';
@@ -971,8 +1087,12 @@
       state.dunkActive = true;
       state.dunkPhase = 'flight';
       state.dunkProgress = 0;
+      state.dunkType = distance <= 5.5 ? 'dunk' : 'layup';
       const defenderDistance = Math.hypot(state.cpu.x - state.player.x, state.cpu.z - state.player.z);
-      state.dunkMade = defenderDistance > 3.2 || Math.random() >= 0.45;
+      const contestDistance = state.dunkType === 'dunk' ? 3.2 : 2.8;
+      const missChance = state.dunkType === 'dunk' ? 0.45 : 0.25;
+      state.dunkMade = defenderDistance > contestDistance || Math.random() >= missChance;
+      showActionStatus(state.dunkType === 'dunk' ? 'DUNK' : 'LAYUP', '#fff');
       state.dunkOrigin.set(state.player.x + 0.65, 1.6, state.player.z - 0.45);
       ballMesh.position.copy(state.dunkOrigin);
       state.canShoot = false;
@@ -980,8 +1100,8 @@
 
     function getShotValue(shooter = 'player') {
       const player = shooter === 'player' ? state.player : state.cpu;
-      const distance = Math.hypot(player.x, player.z + 18);
-      return distance > 11.5 ? 3 : 2;
+      const distance = Math.hypot(player.x, player.z - hoopZ);
+      return distance > 15.2 ? 3 : 2;
     }
 
     function animate() {
@@ -1029,7 +1149,7 @@
       if (state.keys['d']) state.player.x += speed;
 
       state.player.x = THREE.MathUtils.clamp(state.player.x, -15.8, 15.8);
-      state.player.z = THREE.MathUtils.clamp(state.player.z, -16.8, 24);
+      state.player.z = THREE.MathUtils.clamp(state.player.z, courtBounds.minZ, courtBounds.maxZ);
       playerRoot.position.set(state.player.x, 0, state.player.z);
 
       if (moving && Math.random() < 0.008) {
@@ -1055,20 +1175,20 @@
 
       if (state.possession === 'cpu') {
         state.cpuShotCooldown = Math.max(0, state.cpuShotCooldown - 0.016);
-        moveCpuToward(0, -17.8, 0.24);
+        moveCpuToward(0, hoopZ, 0.24);
         state.cpu.x = THREE.MathUtils.clamp(state.cpu.x, -15.8, 15.8);
-        state.cpu.z = THREE.MathUtils.clamp(state.cpu.z, -16.8, 24);
+        state.cpu.z = THREE.MathUtils.clamp(state.cpu.z, courtBounds.minZ, courtBounds.maxZ);
         state.ball.x = state.cpu.x + 0.2;
         state.ball.z = state.cpu.z - 0.8;
 
-        const shotRange = Math.hypot(state.cpu.x, state.cpu.z + 18);
+        const shotRange = Math.hypot(state.cpu.x, state.cpu.z - hoopZ);
         if (shotRange < 12 && state.cpuShotCooldown <= 0 && !state.isBallInAir && !state.shotAnimation) {
           state.cpuShotCooldown = 2.5;
           launchShot('cpu', Math.random() < 0.62);
         }
       } else {
         const towardHoopX = -state.player.x;
-        const towardHoopZ = -17.8 - state.player.z;
+        const towardHoopZ = hoopZ - state.player.z;
         const hoopDistance = Math.hypot(towardHoopX, towardHoopZ) || 1;
         const guardDistance = Math.min(3.2, hoopDistance * 0.55);
         const guardX = state.player.x + towardHoopX / hoopDistance * guardDistance;
@@ -1076,7 +1196,7 @@
         const guardSpeed = state.defenderDelay > 0 ? 0.17 : 0.23;
         moveCpuToward(guardX, guardZ, guardSpeed);
         state.cpu.x = THREE.MathUtils.clamp(state.cpu.x, -15.8, 15.8);
-        state.cpu.z = THREE.MathUtils.clamp(state.cpu.z, -16.8, 24);
+        state.cpu.z = THREE.MathUtils.clamp(state.cpu.z, courtBounds.minZ, courtBounds.maxZ);
       }
 
       cpuRoot.position.set(state.cpu.x, 0, state.cpu.z);
@@ -1184,9 +1304,11 @@
         state.dunkProgress = Math.min(state.dunkProgress + 0.035, 1);
         const p = state.dunkProgress;
         if (state.dunkPhase === 'flight') {
-          playerRoot.position.y = Math.sin(Math.PI * p) * 2.2;
-          ballMesh.position.x = THREE.MathUtils.lerp(state.dunkOrigin.x, 0, p);
-          ballMesh.position.z = THREE.MathUtils.lerp(state.dunkOrigin.z, -17.8, p);
+          const jumpHeight = state.dunkType === 'layup' ? 1.6 : 2.2;
+          playerRoot.position.y = Math.sin(Math.PI * p) * jumpHeight;
+          ballMesh.position.x = THREE.MathUtils.lerp(state.dunkOrigin.x, 0, p)
+            + (state.dunkType === 'layup' ? Math.sin(Math.PI * p) * 0.55 : 0);
+          ballMesh.position.z = THREE.MathUtils.lerp(state.dunkOrigin.z, hoopZ, p);
           ballMesh.position.y = THREE.MathUtils.lerp(state.dunkOrigin.y, 6.35, p) + 1.4 * 4 * p * (1 - p);
           ballMesh.rotation.x += 0.14;
           if (p >= 1) {
@@ -1196,17 +1318,17 @@
               if (Math.random() < 0.8) showReplay();
               checkWinCondition();
               state.dunkPhase = 'net';
-              ballMesh.position.set(0, 6.35, -17.8);
+              ballMesh.position.set(0, 6.35, hoopZ);
             } else {
-              showActionStatus('CONTESTED DUNK MISSED', '#ff4a4a');
+              showActionStatus(`${state.dunkType === 'layup' ? 'LAYUP' : 'DUNK'} MISSED`, '#ff4a4a');
               state.dunkPhase = 'miss';
-              ballMesh.position.set(1.8, 6.35, -17.8);
+              ballMesh.position.set(1.8, 6.35, hoopZ);
             }
             state.dunkProgress = 0;
           }
         } else if (state.dunkPhase === 'net') {
           playerRoot.position.y = 0;
-          ballMesh.position.set(0, THREE.MathUtils.lerp(6.35, 4.25, p), -17.8);
+          ballMesh.position.set(0, THREE.MathUtils.lerp(6.35, 4.25, p), hoopZ);
           ballMesh.rotation.x += 0.1;
           if (p >= 1) {
             state.dunkActive = false;
@@ -1216,10 +1338,10 @@
             awardPossession('cpu', 'player');
           }
         } else {
-          playerRoot.position.y = Math.sin(Math.PI * p) * 1.2;
+          playerRoot.position.y = Math.sin(Math.PI * p) * (state.dunkType === 'layup' ? 0.9 : 1.2);
           ballMesh.position.x = THREE.MathUtils.lerp(1.8, 2.4, p);
           ballMesh.position.y = THREE.MathUtils.lerp(6.35, 0.5, p);
-          ballMesh.position.z = THREE.MathUtils.lerp(-17.8, -16.4, p);
+          ballMesh.position.z = THREE.MathUtils.lerp(hoopZ, hoopZ + 1.4, p);
           ballMesh.rotation.x += 0.14;
           if (p >= 1) {
             playerRoot.position.y = 0;
@@ -1227,7 +1349,7 @@
             state.dunkPhase = '';
             state.dunkProgress = 0;
             state.canShoot = true;
-            awardPossession('cpu');
+            awardPossession('cpu', '', 'player');
           }
         }
         return;
@@ -1256,7 +1378,7 @@
               scoreShot();
               state.shotPhase = 'net';
               state.shotProgress = 0;
-              ballMesh.position.set(0, 6.35, -17.8);
+              ballMesh.position.set(0, 6.35, hoopZ);
             } else {
               state.shotPhase = 'miss';
               state.shotProgress = 0;
@@ -1264,7 +1386,7 @@
             }
           }
         } else if (state.shotPhase === 'net') {
-          ballMesh.position.set(0, THREE.MathUtils.lerp(6.35, 4.25, p), -17.8);
+          ballMesh.position.set(0, THREE.MathUtils.lerp(6.35, 4.25, p), hoopZ);
           ballMesh.rotation.x += 0.1;
           if (p >= 1) {
             endShotAnimation(state.shotShooter === 'player' ? 'cpu' : 'player');
@@ -1331,10 +1453,11 @@
       document.getElementById('block-meter').style.display = 'none';
       document.querySelector('#shot-meter .meter-fill').style.height = '0%';
       document.querySelector('#block-meter .meter-fill').style.height = '0%';
-      awardPossession(state.shotShooter === 'player' ? 'cpu' : 'player');
+      const nextPossession = state.shotShooter === 'player' ? 'cpu' : 'player';
+      awardPossession(nextPossession, '', state.shotShooter);
     }
 
-    function awardPossession(recipient, scorer = '') {
+    function awardPossession(recipient, scorer = '', missedShooter = '') {
       state.possession = recipient;
       const receiver = recipient === 'player' ? state.player : state.cpu;
       const opponent = recipient === 'player' ? state.cpu : state.player;
@@ -1343,6 +1466,11 @@
         receiver.z = state.possessionLine;
         opponent.x = 0;
         opponent.z = -6.5;
+      } else if (missedShooter) {
+        receiver.x = 0;
+        receiver.z = state.possessionLine + 3;
+        opponent.x = 0;
+        opponent.z = state.possessionLine - 2;
       } else {
         receiver.x = 0;
         receiver.z = state.possessionLine + 3;
