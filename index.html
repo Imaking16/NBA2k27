@@ -137,6 +137,51 @@
       color: var(--muted);
     }
 
+    #super-dunk-btn {
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(255,255,255,0.24);
+      border-radius: 7px;
+      padding: 4px;
+      background: #292929;
+      color: #a8a8a8;
+      font: 1.6rem Arial, sans-serif;
+      cursor: not-allowed;
+    }
+
+    #super-dunk-btn.ready:not(:disabled) {
+      background: var(--gold);
+      color: #111;
+      cursor: pointer;
+      box-shadow: 0 0 16px rgba(255,153,0,0.55);
+    }
+
+    .super-dunk-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .super-dunk-charge {
+      display: flex;
+      gap: 5px;
+    }
+
+    .super-dunk-charge span {
+      width: 10px;
+      height: 10px;
+      border: 1px solid rgba(255,255,255,0.55);
+      border-radius: 50%;
+      background: rgba(0,0,0,0.4);
+    }
+
+    .super-dunk-charge span.filled {
+      border-color: var(--gold);
+      background: var(--gold);
+      box-shadow: 0 0 8px rgba(255,153,0,0.75);
+    }
+
     #shot-meter {
       position: absolute;
       left: 50%;
@@ -220,6 +265,38 @@
       border: 14px solid var(--gold);
       background: rgba(255,153,0,0.06);
       pointer-events: none;
+    }
+
+    #poster-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 70;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: rgba(4,4,4,0.82);
+      color: #fff;
+      text-align: center;
+      text-shadow: 0 5px 24px rgba(0,0,0,0.9);
+      pointer-events: none;
+    }
+
+    #poster-overlay .poster-title {
+      color: var(--gold);
+      font-size: 8rem;
+      line-height: 0.9;
+    }
+
+    #poster-overlay .poster-subtitle {
+      font-size: 4rem;
+      line-height: 1;
+    }
+
+    @media (max-width: 600px) {
+      #poster-overlay .poster-title { font-size: 3.2rem; }
+      #poster-overlay .poster-subtitle { font-size: 2.4rem; }
     }
 
     #replay-overlay .tag {
@@ -417,7 +494,9 @@
         <li>Release inside the green window for a makes.</li>
         <li>Any make inside the 3-point arc = 2, outside = 3.</li>
         <li>Hold R and release in green to block a nearby CPU shot.</li>
-        <li>Press E to steal the ball. Press Q near the hoop for a dunk or layup.</li>
+        <li>Press E to steal the ball; a failed steal gives the CPU 1 point.</li>
+        <li>Press Q near the hoop for a dunk or layup.</li>
+        <li>Make two 3-pointers in a row, then press F for the super dunk.</li>
         <li>First to 21 wins.</li>
       </ul>
     </div>
@@ -443,6 +522,10 @@
       Block: HOLD R<br />
       Steal: E<br />
       Finish near hoop: Q (layup / dunk)
+      <div class="super-dunk-control" title="Make two 3-pointers in a row, then press F">
+        <button id="super-dunk-btn" type="button" aria-label="Super dunk locked" disabled>⚡</button>
+        <span class="super-dunk-charge" aria-hidden="true"><span></span><span></span></span>
+      </div>
     </div>
   </div>
 
@@ -458,11 +541,20 @@
     </div>
   </div>
 
+  <div id="poster-overlay" role="status" aria-live="polite">
+    <div class="poster-title">POSTERIZED</div>
+    <div class="poster-subtitle">FLATTENED</div>
+  </div>
+
   <script>
     const state = {
       player: { x: 0, z: 12, score: 0 },
       cpu: { x: 0, z: 6, score: 0 },
       ball: { x: 0, y: 1.2, z: 12 },
+      playerThreeStreak: 0,
+      superDunkReady: false,
+      posterPauseUntil: 0,
+      posterRecipient: '',
       keys: {},
       meterActive: false,
       meterValue: 0,
@@ -475,6 +567,7 @@
       blockDefender: '',
       blockPosition: new THREE.Vector3(),
       cpuShotCooldown: 1.5,
+      cpuPlan: null,
       cpuBlockAttempted: false,
       isBallInAir: false,
       canShoot: true,
@@ -496,8 +589,11 @@
       dunkPhase: '',
       dunkProgress: 0,
       dunkOrigin: new THREE.Vector3(),
+      dunkActorOrigin: new THREE.Vector3(),
+      superDunkPoints: 0,
       dunkMade: true,
       dunkType: '',
+      dunkShooter: 'player',
       gameEnded: false,
       replayActive: false,
       replayTimer: 0,
@@ -593,6 +689,7 @@
         window.addEventListener('keydown', onKeyDown);
         window.addEventListener('keyup', onKeyUp);
         window.addEventListener('resize', onResize);
+        document.getElementById('super-dunk-btn').addEventListener('click', startSuperDunk);
       }
     }
 
@@ -972,18 +1069,23 @@
 
     function onKeyDown(event) {
       const key = event.key.toLowerCase();
+      if (state.posterPauseUntil > performance.now()) return;
       state.keys[key] = true;
 
       if (event.code === 'Space' && state.canShoot && state.possessionResetTimer <= 0 && !state.meterActive && !state.isBallInAir && !state.shotAnimation && !state.dunkActive && state.possession === 'player' && !state.gameEnded) {
         startShotMeter();
       }
 
-      if (key === 'e' && state.possession === 'cpu' && !state.gameEnded) {
+      if (key === 'e' && !event.repeat && state.possession === 'cpu' && !state.gameEnded) {
         attemptSteal();
       }
 
       if (key === 'q' && !event.repeat) {
         startDunk();
+      }
+
+      if (key === 'f' && !event.repeat) {
+        startSuperDunk();
       }
 
       if (key === 'r' && state.possession === 'cpu' && !state.gameEnded && !state.blockMeterActive) {
@@ -1072,10 +1174,11 @@
       state.canShoot = false;
     }
 
-    function startDunk() {
+    function startDunk(superDunk = false) {
       if (state.gameEnded || state.possessionResetTimer > 0 || state.possession !== 'player' || !state.canShoot || state.meterActive || state.shotAnimation || state.dunkActive) return;
       const distance = Math.hypot(state.player.x, state.player.z - hoopZ);
-      if (distance > 9.5 || state.player.z <= hoopZ + 0.5) {
+      if (superDunk && !state.superDunkReady) return;
+      if (!superDunk && (distance > 9.5 || state.player.z <= hoopZ + 0.5)) {
         const status = document.getElementById('shot-status');
         status.textContent = 'GET CLOSER TO THE HOOP';
         status.style.color = '#fff';
@@ -1085,17 +1188,30 @@
       }
 
       state.dunkActive = true;
+      state.dunkShooter = 'player';
       state.dunkPhase = 'flight';
       state.dunkProgress = 0;
-      state.dunkType = distance <= 5.5 ? 'dunk' : 'layup';
+      state.dunkType = superDunk ? 'super' : distance <= 5.5 ? 'dunk' : 'layup';
+      state.dunkActorOrigin.set(state.player.x, 0, state.player.z);
+      state.superDunkPoints = superDunk ? rollSuperDunkPoints() : 0;
       const defenderDistance = Math.hypot(state.cpu.x - state.player.x, state.cpu.z - state.player.z);
       const contestDistance = state.dunkType === 'dunk' ? 3.2 : 2.8;
       const missChance = state.dunkType === 'dunk' ? 0.45 : 0.25;
-      state.dunkMade = defenderDistance > contestDistance || Math.random() >= missChance;
-      showActionStatus(state.dunkType === 'dunk' ? 'DUNK' : 'LAYUP', '#fff');
+      state.dunkMade = superDunk || defenderDistance > contestDistance || Math.random() >= missChance;
+      if (superDunk) {
+        state.playerThreeStreak = 0;
+        state.superDunkReady = false;
+        updateSuperDunkStatus();
+      } else {
+        showActionStatus(state.dunkType === 'dunk' ? 'DUNK' : 'LAYUP', '#fff');
+      }
       state.dunkOrigin.set(state.player.x + 0.65, 1.6, state.player.z - 0.45);
       ballMesh.position.copy(state.dunkOrigin);
       state.canShoot = false;
+    }
+
+    function startSuperDunk() {
+      startDunk(true);
     }
 
     function getShotValue(shooter = 'player') {
@@ -1109,8 +1225,14 @@
       const deltaSeconds = Math.min((now - (state.lastFrameTime ?? now)) / 1000, 0.1);
       state.lastFrameTime = now;
       const t = now * 0.01;
+      if (state.superDunkReady) updateSuperDunkStatus();
 
-      if (!state.gameEnded) {
+      if (state.posterPauseUntil > 0 && now >= state.posterPauseUntil) {
+        finishPosterFreeze();
+      }
+      const posterPaused = state.posterPauseUntil > now;
+
+      if (!posterPaused && !state.gameEnded) {
         updateShotClock(deltaSeconds);
         updatePlayerMovement();
         updateCpuLogic(t);
@@ -1119,7 +1241,7 @@
         updateBlockMeter();
       }
 
-      updateBallAndShot();
+      if (!posterPaused) updateBallAndShot();
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     }
@@ -1175,17 +1297,15 @@
 
       if (state.possession === 'cpu') {
         state.cpuShotCooldown = Math.max(0, state.cpuShotCooldown - 0.016);
-        moveCpuToward(0, hoopZ, 0.24);
+        if (state.shotAnimation || state.dunkActive) {
+          cpuRoot.position.set(state.cpu.x, 0, state.cpu.z);
+          return;
+        }
+        updateCpuOffense();
         state.cpu.x = THREE.MathUtils.clamp(state.cpu.x, -15.8, 15.8);
         state.cpu.z = THREE.MathUtils.clamp(state.cpu.z, courtBounds.minZ, courtBounds.maxZ);
         state.ball.x = state.cpu.x + 0.2;
         state.ball.z = state.cpu.z - 0.8;
-
-        const shotRange = Math.hypot(state.cpu.x, state.cpu.z - hoopZ);
-        if (shotRange < 12 && state.cpuShotCooldown <= 0 && !state.isBallInAir && !state.shotAnimation) {
-          state.cpuShotCooldown = 2.5;
-          launchShot('cpu', Math.random() < 0.62);
-        }
       } else {
         const towardHoopX = -state.player.x;
         const towardHoopZ = hoopZ - state.player.z;
@@ -1200,6 +1320,65 @@
       }
 
       cpuRoot.position.set(state.cpu.x, 0, state.cpu.z);
+    }
+
+    function randomCpuSpot(radius) {
+      const x = (Math.random() * 2 - 1) * radius * 0.68;
+      return { x, z: hoopZ + Math.sqrt(radius * radius - x * x) };
+    }
+
+    function createCpuPlan() {
+      const plans = ['outside-three', 'possession-line', 'inside-three', 'dunk', 'layup', 'drive'];
+      const type = plans[Math.floor(Math.random() * plans.length)];
+      if (type === 'possession-line') {
+        return { type, target: { x: (Math.random() * 2 - 1) * 9, z: state.possessionLine } };
+      }
+      if (type === 'outside-three') return { type, target: randomCpuSpot(17.4) };
+      if (type === 'inside-three') return { type, target: randomCpuSpot(11.2) };
+      if (type === 'dunk') return { type, target: randomCpuSpot(4.1) };
+      if (type === 'layup') return { type, target: randomCpuSpot(7.4) };
+      return { type, phase: 'inside', target: randomCpuSpot(9), outsideTarget: randomCpuSpot(18) };
+    }
+
+    function updateCpuOffense() {
+      if (!state.cpuPlan) state.cpuPlan = createCpuPlan();
+      const plan = state.cpuPlan;
+      moveCpuToward(plan.target.x, plan.target.z, 0.24);
+      const distanceToTarget = Math.hypot(plan.target.x - state.cpu.x, plan.target.z - state.cpu.z);
+      if (distanceToTarget > 1.15 || state.cpuShotCooldown > 0) return;
+
+      if (plan.type === 'drive' && plan.phase === 'inside') {
+        plan.phase = 'outside';
+        plan.target = plan.outsideTarget;
+        return;
+      }
+
+      state.cpuShotCooldown = 2.5;
+      state.cpuPlan = null;
+      if (plan.type === 'dunk' || plan.type === 'layup') {
+        startCpuFinish(plan.type);
+        return;
+      }
+
+      const shotDistance = Math.hypot(state.cpu.x, state.cpu.z - hoopZ);
+      const greenChance = shotDistance > 23 ? 0.14 : shotDistance > 15.2 ? 0.34 : shotDistance > 11.2 ? 0.42 : 0.52;
+      launchShot('cpu', Math.random() < greenChance);
+    }
+
+    function startCpuFinish(type) {
+      state.dunkActive = true;
+      state.dunkShooter = 'cpu';
+      state.dunkType = type;
+      state.dunkPhase = 'flight';
+      state.dunkProgress = 0;
+      state.dunkActorOrigin.set(state.cpu.x, 0, state.cpu.z);
+      state.dunkOrigin.set(state.cpu.x + 0.3, 1.6, state.cpu.z - 0.45);
+      const defenderDistance = Math.hypot(state.player.x - state.cpu.x, state.player.z - state.cpu.z);
+      const contestDistance = type === 'dunk' ? 3.2 : 2.8;
+      const missChance = type === 'dunk' ? 0.45 : 0.25;
+      state.dunkMade = defenderDistance > contestDistance || Math.random() >= missChance;
+      ballMesh.position.copy(state.dunkOrigin);
+      state.canShoot = false;
     }
 
     function moveCpuToward(targetX, targetZ, speed) {
@@ -1276,6 +1455,10 @@
       state.shotPhase = '';
       state.shotGreen = false;
       state.isBallInAir = false;
+      if (state.shotShooter === 'player') {
+        state.playerThreeStreak = 0;
+        updateSuperDunkStatus();
+      }
       ballMesh.position.copy(state.blockPosition);
       showActionStatus('BLOCKED!', '#47ff78');
       return true;
@@ -1295,7 +1478,8 @@
           state.blockDefender = '';
           state.blockProgress = 0;
           state.canShoot = true;
-          awardPossession(winner);
+          const loser = winner === 'player' ? 'cpu' : 'player';
+          awardPossession(winner, '', loser);
         }
         return;
       }
@@ -1304,8 +1488,14 @@
         state.dunkProgress = Math.min(state.dunkProgress + 0.035, 1);
         const p = state.dunkProgress;
         if (state.dunkPhase === 'flight') {
-          const jumpHeight = state.dunkType === 'layup' ? 1.6 : 2.2;
-          playerRoot.position.y = Math.sin(Math.PI * p) * jumpHeight;
+          const dunker = state.dunkShooter === 'player' ? state.player : state.cpu;
+          const dunkerRoot = state.dunkShooter === 'player' ? playerRoot : cpuRoot;
+          const jumpHeight = state.dunkType === 'super' ? 4.2 : state.dunkType === 'layup' ? 1.6 : 2.2;
+          if (state.dunkType === 'super') {
+            dunker.x = THREE.MathUtils.lerp(state.dunkActorOrigin.x, 0, p);
+            dunker.z = THREE.MathUtils.lerp(state.dunkActorOrigin.z, hoopZ + 1.4, p);
+          }
+          dunkerRoot.position.set(dunker.x, Math.sin(Math.PI * p) * jumpHeight, dunker.z);
           ballMesh.position.x = THREE.MathUtils.lerp(state.dunkOrigin.x, 0, p)
             + (state.dunkType === 'layup' ? Math.sin(Math.PI * p) * 0.55 : 0);
           ballMesh.position.z = THREE.MathUtils.lerp(state.dunkOrigin.z, hoopZ, p);
@@ -1313,10 +1503,25 @@
           ballMesh.rotation.x += 0.14;
           if (p >= 1) {
             if (state.dunkMade) {
-              state.player.score += 2;
+              const scorer = state.dunkShooter;
+              const points = state.dunkType === 'super' ? state.superDunkPoints : 2;
+              state[scorer].score += points;
+              if (scorer === 'player' && state.dunkType !== 'super') {
+                state.playerThreeStreak = 0;
+                updateSuperDunkStatus();
+              }
               updateHud();
-              if (Math.random() < 0.8) showReplay();
+              if (state.dunkType !== 'super' && Math.random() < 0.8) showReplay();
               checkWinCondition();
+              if (state.dunkType === 'super') {
+                state.dunkActive = false;
+                state.dunkPhase = '';
+                state.dunkProgress = 0;
+                state.canShoot = true;
+                playerRoot.position.y = 0;
+                triggerPosterFreeze();
+                return;
+              }
               state.dunkPhase = 'net';
               ballMesh.position.set(0, 6.35, hoopZ);
             } else {
@@ -1335,21 +1540,26 @@
             state.dunkPhase = '';
             state.dunkProgress = 0;
             state.canShoot = true;
-            awardPossession('cpu', 'player');
+            const scorer = state.dunkShooter;
+            const receiver = scorer === 'player' ? 'cpu' : 'player';
+            awardPossession(receiver, scorer);
           }
         } else {
-          playerRoot.position.y = Math.sin(Math.PI * p) * (state.dunkType === 'layup' ? 0.9 : 1.2);
+          const loserRoot = state.dunkShooter === 'player' ? playerRoot : cpuRoot;
+          loserRoot.position.y = Math.sin(Math.PI * p) * (state.dunkType === 'layup' ? 0.9 : 1.2);
           ballMesh.position.x = THREE.MathUtils.lerp(1.8, 2.4, p);
           ballMesh.position.y = THREE.MathUtils.lerp(6.35, 0.5, p);
           ballMesh.position.z = THREE.MathUtils.lerp(hoopZ, hoopZ + 1.4, p);
           ballMesh.rotation.x += 0.14;
           if (p >= 1) {
-            playerRoot.position.y = 0;
+            loserRoot.position.y = 0;
             state.dunkActive = false;
             state.dunkPhase = '';
             state.dunkProgress = 0;
             state.canShoot = true;
-            awardPossession('cpu', '', 'player');
+            const loser = state.dunkShooter;
+            const receiver = loser === 'player' ? 'cpu' : 'player';
+            awardPossession(receiver, '', loser);
           }
         }
         return;
@@ -1419,6 +1629,9 @@
     function scoreShot() {
       if (state.shotShooter === 'player') {
         state.player.score += state.shotValue;
+        state.playerThreeStreak = state.shotValue === 3 ? state.playerThreeStreak + 1 : 0;
+        if (state.playerThreeStreak >= 2) state.superDunkReady = true;
+        updateSuperDunkStatus();
       } else {
         state.cpu.score += state.shotValue;
       }
@@ -1449,6 +1662,10 @@
       state.blockMeterActive = false;
       state.blockActive = false;
       state.blockProgress = 0;
+      if (state.shotShooter === 'player') {
+        state.playerThreeStreak = 0;
+        updateSuperDunkStatus();
+      }
       document.getElementById('shot-meter').style.display = 'none';
       document.getElementById('block-meter').style.display = 'none';
       document.querySelector('#shot-meter .meter-fill').style.height = '0%';
@@ -1457,7 +1674,7 @@
       awardPossession(nextPossession, '', state.shotShooter);
     }
 
-    function awardPossession(recipient, scorer = '', missedShooter = '') {
+    function awardPossession(recipient, scorer = '', opponentInFront = '') {
       state.possession = recipient;
       const receiver = recipient === 'player' ? state.player : state.cpu;
       const opponent = recipient === 'player' ? state.cpu : state.player;
@@ -1465,8 +1682,8 @@
         receiver.x = 0;
         receiver.z = state.possessionLine;
         opponent.x = 0;
-        opponent.z = -6.5;
-      } else if (missedShooter) {
+        opponent.z = hoopZ + 15.2;
+      } else if (opponentInFront) {
         receiver.x = 0;
         receiver.z = state.possessionLine + 3;
         opponent.x = 0;
@@ -1480,6 +1697,7 @@
       state.possessionResetTimer = 1.2;
       state.shotClock = 24;
       state.cpuShotCooldown = 1.5;
+      state.cpuPlan = null;
       document.getElementById('shot-clock').textContent = '24';
       playerRoot.position.set(state.player.x, 0, state.player.z);
       cpuRoot.position.set(state.cpu.x, 0, state.cpu.z);
@@ -1487,6 +1705,28 @@
       state.ball.y = 1.3;
       state.ball.z = receiver.z - 0.7;
       ballMesh.position.set(state.ball.x, state.ball.y, state.ball.z);
+      updateSuperDunkStatus();
+    }
+
+    function updateSuperDunkStatus() {
+      const button = document.getElementById('super-dunk-btn');
+      if (!button) return;
+      const available = state.superDunkReady
+        && state.possession === 'player'
+        && state.possessionResetTimer <= 0
+        && !state.shotAnimation
+        && !state.dunkActive
+        && !state.gameEnded;
+      button.disabled = !available;
+      button.classList.toggle('ready', available);
+      button.setAttribute('aria-label', available ? 'Super dunk ready, press F' : 'Super dunk charge');
+      const pips = document.querySelectorAll('.super-dunk-charge span');
+      pips.forEach((pip, index) => pip.classList.toggle('filled', index < Math.min(state.playerThreeStreak, 2)));
+    }
+
+    function rollSuperDunkPoints() {
+      const roll = Math.random();
+      return roll >= 0.95 ? 10 : Math.floor(roll / 0.95 * 9) + 1;
     }
 
     function showReplay() {
@@ -1510,12 +1750,15 @@
       const dist = Math.hypot(dx, dz);
       if (dist > 2.2) return;
 
-      const success = Math.random() < 0.74;
+      const success = Math.random() < 0.5;
       if (success) {
-        awardPossession('player');
+        awardPossession('player', '', 'cpu');
         return;
       }
 
+      state.cpu.score += 1;
+      updateHud();
+      checkWinCondition();
       const status = document.getElementById('shot-status');
       status.textContent = 'STEAL FAILED';
       status.style.color = '#ff4a4a';
@@ -1531,11 +1774,36 @@
 
     function finishGame() {
       state.gameEnded = true;
+      updateSuperDunkStatus();
       const result = state.player.score > state.cpu.score ? 'YOU WON' : 'YOU LOST';
       const summary = `Final score: ${state.player.score} - ${state.cpu.score}`;
       document.getElementById('result-title').textContent = result;
       document.getElementById('result-summary').textContent = summary;
       document.getElementById('end-screen').style.display = 'flex';
+    }
+
+    function triggerPosterFreeze() {
+      state.posterPauseUntil = performance.now() + 4000;
+      state.posterRecipient = 'cpu';
+      state.keys = {};
+      state.cpu.x = 1.1;
+      state.cpu.z = hoopZ + 1.4;
+      cpuRoot.position.set(state.cpu.x, 0.15, state.cpu.z);
+      cpuRoot.rotation.set(Math.PI / 2, 0, 0);
+      document.getElementById('poster-overlay').style.display = 'flex';
+    }
+
+    function finishPosterFreeze() {
+      state.posterPauseUntil = 0;
+      document.getElementById('poster-overlay').style.display = 'none';
+      cpuRoot.rotation.set(0, 0, 0);
+      const recipient = state.posterRecipient;
+      state.posterRecipient = '';
+      if (recipient && !state.gameEnded) {
+        awardPossession(recipient, 'player');
+      } else {
+        cpuRoot.position.set(state.cpu.x, 0, state.cpu.z);
+      }
     }
 
     function restartGame() {
@@ -1550,6 +1818,8 @@
       state.player.z = 12;
       state.cpu.x = 0;
       state.cpu.z = 6;
+      playerRoot.position.set(state.player.x, 0, state.player.z);
+      cpuRoot.position.set(state.cpu.x, 0, state.cpu.z);
       state.isBallInAir = false;
       state.meterActive = false;
       state.shotGreen = false;
@@ -1559,6 +1829,15 @@
       state.dunkActive = false;
       state.dunkPhase = '';
       state.dunkProgress = 0;
+      state.dunkType = '';
+      state.dunkShooter = 'player';
+      state.playerThreeStreak = 0;
+      state.superDunkReady = false;
+      state.posterPauseUntil = 0;
+      state.posterRecipient = '';
+      state.cpuPlan = null;
+      cpuRoot.rotation.set(0, 0, 0);
+      document.getElementById('poster-overlay').style.display = 'none';
       playerRoot.position.y = 0;
       state.blockMeterActive = false;
       state.blockActive = false;
@@ -1576,6 +1855,7 @@
       document.getElementById('block-meter').style.display = 'none';
       document.querySelector('#shot-meter .meter-fill').style.height = '0%';
       document.querySelector('#block-meter .meter-fill').style.height = '0%';
+      updateSuperDunkStatus();
       ballMesh.position.set(0.8, 1.3, 11.3);
       document.getElementById('shot-clock').textContent = '24';
       updateHud();
