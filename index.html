@@ -137,7 +137,8 @@
       color: var(--muted);
     }
 
-    #super-dunk-btn {
+    #super-dunk-btn,
+    #ankle-breaker-btn {
       width: 42px;
       height: 42px;
       border: 1px solid rgba(255,255,255,0.24);
@@ -149,7 +150,8 @@
       cursor: not-allowed;
     }
 
-    #super-dunk-btn.ready:not(:disabled) {
+    #super-dunk-btn.ready:not(:disabled),
+    #ankle-breaker-btn.ready:not(:disabled) {
       background: var(--gold);
       color: #111;
       cursor: pointer;
@@ -218,8 +220,8 @@
       position: absolute;
       left: 0;
       right: 0;
-      top: 22%;
-      height: 28%;
+      top: 38%;
+      height: 24%;
       background: rgba(71,255,120,0.85);
       box-shadow: 0 0 18px rgba(71,255,120,0.72);
     }
@@ -319,11 +321,14 @@
       display: none;
       align-items: center;
       justify-content: center;
-      background: rgba(0,0,0,0.8);
-      backdrop-filter: blur(4px);
+      padding: 18px;
+      overflow-y: auto;
+      background: radial-gradient(circle at top, #142236 0%, #070a11 54%, #020305 100%);
     }
 
-    #end-box {
+    #end-box,
+    #upgrade-box,
+    #pause-box {
       width: min(580px, 80vw);
       background: rgba(15,15,15,0.95);
       border: 3px solid var(--gold);
@@ -333,13 +338,17 @@
       text-align: center;
     }
 
-    #end-box h1 {
+    #end-box h1,
+    #upgrade-box h1,
+    #pause-box h1 {
       margin: 0 0 18px;
       font-size: clamp(2.2rem, 4vw, 4rem);
       letter-spacing: 2px;
     }
 
-    #end-box p {
+    #end-box p,
+    #upgrade-box p,
+    #pause-box p {
       margin: 0 0 18px;
       font-family: Arial, sans-serif;
       font-size: 1.05rem;
@@ -347,7 +356,12 @@
       color: var(--muted);
     }
 
-    #next-btn {
+    #next-btn,
+    #open-upgrades-btn,
+    #next-from-upgrades-btn,
+    #resume-btn,
+    #reset-record-btn,
+    .upgrade-button {
       border: none;
       background: var(--gold);
       color: #111;
@@ -356,6 +370,263 @@
       font-size: 1.25rem;
       cursor: pointer;
       box-shadow: 0 10px 18px rgba(255,153,0,0.32);
+    }
+
+    #reset-record-btn,
+    #next-from-upgrades-btn {
+      margin-left: 8px;
+      background: #343434;
+      color: #fff;
+      box-shadow: none;
+    }
+
+    #upgrade-screen,
+    #pause-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      overflow-y: auto;
+      background: rgba(0,0,0,0.9);
+      backdrop-filter: blur(5px);
+    }
+
+    #upgrade-box {
+      width: min(760px, 94vw);
+      max-height: 94vh;
+      overflow-y: auto;
+    }
+
+    #upgrade-box {
+      width: min(1220px, 96vw);
+      padding: 22px;
+      border-color: #18baff;
+      background: linear-gradient(135deg, rgba(5,13,29,0.98), rgba(10,18,34,0.98) 55%, rgba(15,12,22,0.98));
+      box-shadow: 0 0 36px rgba(24,186,255,0.18);
+    }
+
+    #upgrade-box h1 {
+      margin-bottom: 8px;
+      color: #f5f8ff;
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+    }
+
+    .builder-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      font: 700 0.95rem Arial, sans-serif;
+      color: #d7e7ff;
+    }
+
+    #upgrade-wallet {
+      margin: 0;
+      color: #7ef4a4;
+      font-weight: 700;
+    }
+
+    #upgrade-lock-note {
+      margin: 0 0 16px;
+      font-size: 0.86rem;
+    }
+
+    .builder-layout {
+      display: grid;
+      grid-template-columns: minmax(150px, 0.7fr) minmax(350px, 1.7fr) minmax(230px, 1fr);
+      gap: 14px;
+      align-items: stretch;
+      text-align: left;
+    }
+
+    .builder-panel {
+      padding: 15px;
+      border: 1px solid rgba(91,180,255,0.35);
+      border-radius: 10px;
+      background: linear-gradient(160deg, rgba(15,31,54,0.96), rgba(8,15,28,0.98));
+      font-family: Arial, sans-serif;
+    }
+
+    .builder-profile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .builder-emblem {
+      display: grid;
+      place-items: center;
+      width: 76px;
+      height: 76px;
+      margin: 4px 0 12px;
+      border: 2px solid #32c5ff;
+      border-radius: 50%;
+      background: radial-gradient(circle, #234d7a, #0a1325 70%);
+      box-shadow: 0 0 24px rgba(24,186,255,0.25);
+      font-size: 2.6rem;
+    }
+
+    .builder-profile h2,
+    .builder-section-title {
+      margin: 0 0 12px;
+      color: #35c4ff;
+      font: 1.05rem Impact, 'Arial Black', Arial, sans-serif;
+      letter-spacing: 1.2px;
+    }
+
+    .builder-profile p {
+      margin: 4px 0;
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .overall-rating {
+      color: #71ffa0;
+      font: 700 3rem Impact, 'Arial Black', Arial, sans-serif;
+      text-shadow: 0 0 16px rgba(71,255,120,0.28);
+    }
+
+    .attribute-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .attribute-row {
+      display: grid;
+      grid-template-columns: minmax(90px, 1fr) minmax(70px, 1.2fr) 42px minmax(108px, auto);
+      align-items: center;
+      gap: 9px;
+      min-height: 38px;
+      color: #eef4ff;
+      font-size: 0.83rem;
+    }
+
+    .attribute-name small,
+    .powerup-detail {
+      display: block;
+      margin-top: 3px;
+      color: #9eb4ca;
+      font: 0.68rem/1.35 Arial, sans-serif;
+    }
+
+    .attribute-meter {
+      height: 9px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 99px;
+      background: #111b2c;
+    }
+
+    .attribute-meter span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #20aaff, #59ecff);
+      box-shadow: 0 0 10px rgba(32,170,255,0.45);
+      transition: width 0.2s ease;
+    }
+
+    .attribute-rating {
+      color: #b9f7ff;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .upgrade-button {
+      padding: 8px 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 5px;
+      background: linear-gradient(90deg, #138fd4, #1ac5db);
+      color: white;
+      box-shadow: 0 5px 14px rgba(0,132,220,0.24);
+      font: 700 0.72rem Arial, sans-serif;
+      white-space: nowrap;
+    }
+
+    .upgrade-button[data-upgrade="superDunk"],
+    .upgrade-button[data-upgrade="ankleBreaker"],
+    .upgrade-button[data-upgrade="salary"] {
+      background: linear-gradient(90deg, #b57213, #f0ad36);
+      color: #1b1408;
+      box-shadow: 0 5px 14px rgba(235,159,31,0.2);
+    }
+
+    .upgrade-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.48;
+      filter: grayscale(0.65);
+    }
+
+    .powerup-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .powerup-card {
+      padding: 12px;
+      border: 1px solid rgba(255,181,64,0.28);
+      border-radius: 8px;
+      background: rgba(255,172,45,0.055);
+    }
+
+    .powerup-card h3 {
+      margin: 0 0 6px;
+      color: #ffbf54;
+      font: 1rem Impact, 'Arial Black', Arial, sans-serif;
+      letter-spacing: 0.8px;
+    }
+
+    .powerup-card p {
+      min-height: 0;
+      margin: 0 0 9px;
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+
+    .builder-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 9px;
+      margin-top: 16px;
+    }
+
+    #next-from-upgrades-btn {
+      margin: 0;
+      padding: 10px 18px;
+      font-size: 0.9rem;
+    }
+
+    #pause-screen {
+      z-index: 85;
+    }
+
+    @media (max-width: 600px) {
+      #end-box, #pause-box { width: 94vw; padding: 22px 16px; }
+      #reset-record-btn { margin: 10px 0 0; }
+    }
+
+    @media (max-width: 900px) {
+      #upgrade-box { padding: 16px; }
+      .builder-layout { grid-template-columns: minmax(125px, 0.6fr) minmax(300px, 1.4fr); }
+      .powerup-panel { grid-column: 1 / -1; }
+      .powerup-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 600px) {
+      #upgrade-screen { padding: 8px; align-items: flex-start; }
+      #upgrade-box { width: 100%; max-height: none; }
+      .builder-topbar { align-items: flex-start; flex-direction: column; }
+      .builder-layout { grid-template-columns: 1fr; }
+      .builder-profile { min-height: 160px; }
+      .powerup-panel { grid-column: auto; }
+      .powerup-list { grid-template-columns: 1fr; }
+      .attribute-row { grid-template-columns: minmax(80px, 1fr) 0.9fr 28px; }
+      .attribute-row .upgrade-button { grid-column: 1 / -1; }
     }
 
     #loading-screen {
@@ -384,6 +655,131 @@
       gap: 54px;
       margin-bottom: 36px;
       flex-wrap: wrap;
+    }
+
+    #difficulty-control {
+      position: fixed;
+      top: 22px;
+      right: 24px;
+      z-index: 2;
+      display: grid;
+      gap: 6px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      background: rgba(12,12,12,0.88);
+      color: var(--muted);
+      font: 700 0.75rem Arial, sans-serif;
+      letter-spacing: 0.6px;
+    }
+
+    #difficulty-select {
+      min-width: 155px;
+      padding: 7px 9px;
+      border: 1px solid rgba(255,153,0,0.6);
+      border-radius: 6px;
+      background: #171717;
+      color: white;
+      font: 0.9rem Arial, sans-serif;
+    }
+
+    #profile-slots {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      z-index: 3;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      width: min(94vw, 440px);
+      transform: translateX(-50%);
+    }
+
+    .profile-slot {
+      display: grid;
+      place-items: center;
+      width: 82px;
+      height: 66px;
+      padding: 5px;
+      border: 2px solid rgba(255,255,255,0.28);
+      border-radius: 10px;
+      background: rgba(10,10,10,0.88);
+      color: white;
+      font: 700 0.78rem Arial, sans-serif;
+      text-align: center;
+      overflow-wrap: anywhere;
+      cursor: pointer;
+    }
+
+    .profile-slot-empty {
+      color: var(--gold);
+      font: 2rem Arial, sans-serif;
+    }
+
+    .profile-slot.selected {
+      border-color: #ffe400;
+      box-shadow: 0 0 14px rgba(255,228,0,0.75);
+    }
+
+    #profile-name-form {
+      position: fixed;
+      left: 50%;
+      bottom: 98px;
+      z-index: 4;
+      display: none;
+      width: min(340px, 90vw);
+      padding: 12px;
+      border: 1px solid rgba(255,153,0,0.65);
+      border-radius: 10px;
+      background: rgba(12,12,12,0.96);
+      transform: translateX(-50%);
+    }
+
+    #profile-name-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid rgba(255,255,255,0.32);
+      border-radius: 6px;
+      background: #171717;
+      color: white;
+      font: 1rem Arial, sans-serif;
+    }
+
+    #profile-name-error {
+      display: none;
+      margin: 8px 0 0;
+      color: #ff7777;
+      font: 0.85rem/1.4 Arial, sans-serif;
+    }
+
+    #delete-profile-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 4;
+      display: none;
+      width: 46px;
+      height: 46px;
+      border: 1px solid rgba(255,255,255,0.28);
+      border-radius: 8px;
+      background: rgba(18,18,18,0.92);
+      color: #ff7777;
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+
+    #upgrade-player-name {
+      position: fixed;
+      left: 22px;
+      bottom: 18px;
+      z-index: 85;
+      display: none;
+      max-width: min(40vw, 360px);
+      color: #ffe400;
+      font: 700 clamp(1rem, 2vw, 1.5rem) Arial, sans-serif;
+      overflow-wrap: anywhere;
+      text-shadow: 0 2px 8px #000;
+      pointer-events: none;
     }
 
     .team-card {
@@ -424,6 +820,18 @@
       box-shadow: 0 10px 18px rgba(255,153,0,0.28);
     }
 
+    @media (max-width: 600px) {
+      #difficulty-control {
+        position: static;
+        margin: -18px 0 20px;
+      }
+      #profile-slots { bottom: 12px; gap: 7px; }
+      .profile-slot { width: min(20vw, 72px); height: 58px; font-size: 0.68rem; }
+      #profile-name-form { bottom: 82px; }
+      #delete-profile-btn { top: 12px; left: 12px; }
+      #upgrade-player-name { left: 12px; bottom: 10px; }
+    }
+
     #intro-cinematic {
       position: fixed;
       inset: 0;
@@ -456,7 +864,7 @@
 </head>
 <body>
   <div id="loading-screen">
-    <h1>NBA 2K27 LOADING...</h1>
+    <h1>NBA 2K27 · TIP-OFF</h1>
     <div class="matchup">
       <div class="team-card">
         <div class="team-title">WARRIORS</div>
@@ -472,7 +880,22 @@
         </div>
       </div>
     </div>
-    <button id="tipoff-btn" type="button">ADVANCE TO TIP-OFF</button>
+    <label id="difficulty-control" for="difficulty-select">
+      CPU DIFFICULTY
+      <select id="difficulty-select">
+        <option value="rookie">Rookie</option>
+        <option value="pro">Pro</option>
+        <option value="hallOfFamer">Hall of Famer</option>
+        <option value="legend">Legend</option>
+      </select>
+    </label>
+    <button id="tipoff-btn" type="button">TIP OFF</button>
+    <button id="delete-profile-btn" type="button" aria-label="Delete selected player profile" title="Delete selected profile">🗑</button>
+    <div id="profile-slots" aria-label="Player profiles"></div>
+    <form id="profile-name-form">
+      <input id="profile-name-input" type="text" maxlength="20" autocomplete="off" placeholder="Enter player name" aria-label="Player name" />
+      <p id="profile-name-error" role="alert" aria-live="polite"></p>
+    </form>
   </div>
 
   <div id="intro-cinematic">
@@ -497,6 +920,7 @@
         <li>Press E to steal the ball; a failed steal gives the CPU 1 point.</li>
         <li>Press Q near the hoop for a dunk or layup.</li>
         <li>Make two 3-pointers in a row, then press F for the super dunk.</li>
+        <li>Make five layups in a row, then press G to freeze your opponent for 2-4 seconds.</li>
         <li>First to 21 wins.</li>
       </ul>
     </div>
@@ -518,13 +942,20 @@
     <div id="controls-hint">
       <strong>CONTROLS:</strong><br />
       Move: W A S D<br />
+      Sprint: HOLD SHIFT<br />
+      <span id="sprint-status">SPRINT READY</span><br />
       Shoot: HOLD SPACE<br />
       Block: HOLD R<br />
       Steal: E<br />
-      Finish near hoop: Q (layup / dunk)
+      Finish near hoop: Q (layup / dunk)<br />
+      Ankle breaker: G (after 5 layups)
       <div class="super-dunk-control" title="Make two 3-pointers in a row, then press F">
         <button id="super-dunk-btn" type="button" aria-label="Super dunk locked" disabled>⚡</button>
         <span class="super-dunk-charge" aria-hidden="true"><span></span><span></span></span>
+      </div>
+      <div class="super-dunk-control" title="Make five layups in a row, then press G">
+        <button id="ankle-breaker-btn" type="button" aria-label="Ankle breaker locked" disabled>↝</button>
+        <span class="super-dunk-charge" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
       </div>
     </div>
   </div>
@@ -535,9 +966,107 @@
 
   <div id="end-screen">
     <div id="end-box">
-      <h1 id="result-title">YOU WON</h1>
+      <h1>GAME RECORD</h1>
+      <p id="result-title">YOU WON</p>
       <p id="result-summary">Final score: 21 - 0</p>
-      <button id="next-btn" type="button">NEXT</button>
+      <p id="record-summary"></p>
+      <p id="progress-summary"></p>
+      <button id="open-upgrades-btn" type="button">UPGRADE PLAYER</button>
+      <button id="reset-record-btn" type="button">RESET RECORD</button>
+      <button id="next-btn" type="button">NEXT GAME</button>
+    </div>
+  </div>
+
+  <div id="upgrade-screen">
+    <div id="upgrade-player-name"></div>
+    <div id="upgrade-box">
+      <div class="builder-topbar">
+        <div>
+          <h1>MYPLAYER BUILDER</h1>
+          <div id="upgrade-lock-note"></div>
+        </div>
+        <p id="upgrade-wallet"></p>
+      </div>
+      <div class="builder-layout">
+        <section class="builder-panel builder-profile" aria-label="Player profile">
+          <div class="builder-emblem" aria-hidden="true">🏀</div>
+          <h2>GOLDEN STATE<br />WARRIORS</h2>
+          <div id="player-overall" class="overall-rating">2</div>
+          <p>PLAYER OVERALL</p>
+          <p>UPGRADE YOUR ATTRIBUTES<br />AND BUILD YOUR GAME</p>
+        </section>
+
+        <section class="builder-panel" aria-label="Player attributes">
+          <h2 class="builder-section-title">PLAYER ATTRIBUTES</h2>
+          <div class="attribute-list">
+            <div class="attribute-row">
+              <span class="attribute-name">Speed<small id="detail-speed"></small></span><div class="attribute-meter"><span id="bar-speed"></span></div>
+              <span id="rating-speed" class="attribute-rating"></span>
+              <button class="upgrade-button" data-upgrade="speed" type="button"></button>
+            </div>
+            <div class="attribute-row">
+              <span class="attribute-name">3 Point<small id="detail-threePoint"></small></span><div class="attribute-meter"><span id="bar-threePoint"></span></div>
+              <span id="rating-threePoint" class="attribute-rating"></span>
+              <button class="upgrade-button" data-upgrade="threePoint" type="button"></button>
+            </div>
+            <div class="attribute-row">
+              <span class="attribute-name">Layup / Dunk<small id="detail-layupDunk"></small></span><div class="attribute-meter"><span id="bar-layupDunk"></span></div>
+              <span id="rating-layupDunk" class="attribute-rating"></span>
+              <button class="upgrade-button" data-upgrade="layupDunk" type="button"></button>
+            </div>
+            <div class="attribute-row">
+              <span class="attribute-name">Steal<small id="detail-steal"></small></span><div class="attribute-meter"><span id="bar-steal"></span></div>
+              <span id="rating-steal" class="attribute-rating"></span>
+              <button class="upgrade-button" data-upgrade="steal" type="button"></button>
+            </div>
+            <div class="attribute-row">
+              <span class="attribute-name">Block Window<small id="detail-block"></small></span><div class="attribute-meter"><span id="bar-block"></span></div>
+              <span id="rating-block" class="attribute-rating"></span>
+              <button class="upgrade-button" data-upgrade="block" type="button"></button>
+            </div>
+            <div class="attribute-row">
+              <span class="attribute-name">Block Range<small id="detail-blockRange"></small></span><div class="attribute-meter"><span id="bar-blockRange"></span></div>
+              <span id="rating-blockRange" class="attribute-rating"></span>
+              <button class="upgrade-button" data-upgrade="blockRange" type="button"></button>
+            </div>
+          </div>
+        </section>
+
+        <section class="builder-panel powerup-panel" aria-label="Power-up upgrades">
+          <h2 class="builder-section-title">POWER UPS</h2>
+          <div class="powerup-list">
+            <div class="powerup-card">
+              <h3>SUPER DUNK</h3>
+              <p id="super-dunk-level"></p>
+              <span id="super-dunk-detail" class="powerup-detail"></span>
+              <button class="upgrade-button" data-upgrade="superDunk" type="button"></button>
+            </div>
+            <div class="powerup-card">
+              <h3>ANKLE BREAKER</h3>
+              <p id="ankle-level"></p>
+              <span id="ankle-detail" class="powerup-detail"></span>
+              <button class="upgrade-button" data-upgrade="ankleBreaker" type="button"></button>
+            </div>
+            <div class="powerup-card">
+              <h3>GAME SALARY</h3>
+              <p id="salary-level"></p>
+              <span id="salary-detail" class="powerup-detail"></span>
+              <button class="upgrade-button" data-upgrade="salary" type="button"></button>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="builder-footer">
+        <button id="next-from-upgrades-btn" type="button">NEXT GAME</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="pause-screen">
+    <div id="pause-box">
+      <h1>PAUSED</h1>
+      <p>Press Escape or choose Resume to continue the game.</p>
+      <button id="resume-btn" type="button">RESUME</button>
     </div>
   </div>
 
@@ -547,12 +1076,241 @@
   </div>
 
   <script>
+    const progressStorageKey = 'nba2k27-warriors-progression';
+    const profileStorageKey = 'nba2k27-player-profiles';
+    const attributeNames = ['speed', 'threePoint', 'layupDunk', 'steal', 'block', 'blockRange'];
+    const powerUpNames = ['superDunk', 'ankleBreaker'];
+    const upgradeLimits = {
+      speed: 9,
+      threePoint: 18,
+      layupDunk: 18,
+      steal: 16,
+      block: 18,
+      blockRange: 18,
+      superDunk: 9,
+      ankleBreaker: 6,
+      salary: 11
+    };
+    const playerHeight = 5.6;
+    const cpuDifficulties = {
+      rookie: {
+        overall: 25,
+        openShotChance: 0.471,
+        threePointChance: 0.471,
+        contestedShotPenalty: 0,
+        offenseSpeed: 0.27,
+        defenseSpeed: 0.25,
+        sprintSpeed: 0.46,
+        sprintChance: 0.002,
+        sprintDistance: 8,
+        blockRange: 0.75,
+        blockChance: 0.25,
+        stealChance: 0.05,
+        powerUpChance: 0
+      },
+      pro: {
+        openShotChance: 0.5033,
+        threePointChance: 0.5033,
+        contestedShotPenalty: 0.24,
+        offenseSpeed: 0.29,
+        defenseSpeed: 0.29,
+        sprintSpeed: 0.49,
+        sprintChance: 0.0025,
+        sprintDistance: 9,
+        blockRange: 0.9,
+        blockChance: 0.34,
+        stealChance: 0.12,
+        powerUpChance: 0.003
+      },
+      hallOfFamer: {
+        openShotChance: 0.5823,
+        threePointChance: 0.5033,
+        contestedShotPenalty: 0.24,
+        offenseSpeed: 0.32,
+        defenseSpeed: 0.34,
+        sprintSpeed: 0.53,
+        sprintChance: 0.0035,
+        sprintDistance: 10,
+        blockRange: 1.2,
+        blockChance: 0.44,
+        stealChance: 0.2,
+        powerUpChance: 0.004
+      },
+      legend: {
+        openShotChance: 0.6734,
+        threePointChance: 0.6734,
+        contestedShotPenalty: 0.24,
+        offenseSpeed: 0.35,
+        defenseSpeed: 0.38,
+        sprintSpeed: 0.57,
+        sprintChance: 0.0045,
+        sprintDistance: 11,
+        blockRange: 1.5,
+        blockChance: 0.56,
+        stealChance: 0.28,
+        powerUpChance: 0.005
+      }
+    };
+
+    function validLevel(value, maximum) {
+      return Number.isSafeInteger(value) ? Math.max(0, Math.min(maximum, value)) : null;
+    }
+
+    function loadProgression(savedData) {
+      const defaults = {
+        wins: 0,
+        losses: 0,
+        winStreak: 0,
+        bestWinStreak: 0,
+        coins: 0,
+        salary: 2,
+        attributes: { speed: 2, threePoint: 2, layupDunk: 2, steal: 0, block: 0, blockRange: 0 },
+        powerUps: { superDunk: 0, ankleBreaker: 0 },
+        upgradePurchases: {}
+      };
+      try {
+        const saved = savedData ?? JSON.parse(localStorage.getItem(progressStorageKey) || 'null');
+        if (!saved || typeof saved !== 'object') return defaults;
+        const legacyUpgrades = saved.upgrades && typeof saved.upgrades === 'object' ? saved.upgrades : {};
+        const savedAttributes = saved.attributes && typeof saved.attributes === 'object' ? saved.attributes : {};
+        const savedPowerUps = saved.powerUps && typeof saved.powerUps === 'object' ? saved.powerUps : {};
+        const savedPurchases = saved.upgradePurchases && typeof saved.upgradePurchases === 'object'
+          ? saved.upgradePurchases
+          : {};
+        const legacyLevel = (name, maximum = 20) => validLevel(legacyUpgrades[name], maximum) ?? 0;
+        const savedSpeedRating = validLevel(savedAttributes.speed, 20) ?? (2 + legacyLevel('sprint') * 2);
+        const attributeLevels = {
+          speed: Math.max(0, Math.min(9, Math.floor((savedSpeedRating - 2) / 2))),
+          threePoint: Math.max(0, Math.min(18, (validLevel(savedAttributes.threePoint, 20) ?? (2 + legacyLevel('threePoint'))) - 2)),
+          layupDunk: Math.max(0, Math.min(18, (validLevel(savedAttributes.layupDunk, 20) ?? 2) - 2)),
+          steal: validLevel(savedAttributes.steal, upgradeLimits.steal) ?? 0,
+          block: validLevel(savedAttributes.block, upgradeLimits.block) ?? 0,
+          blockRange: validLevel(savedAttributes.blockRange, upgradeLimits.blockRange) ?? 0
+        };
+        const powerUpLevels = {
+          superDunk: validLevel(savedPowerUps.superDunk, 9) ?? legacyLevel('superDunk', 9),
+          ankleBreaker: validLevel(savedPowerUps.ankleBreaker, 6) ?? legacyLevel('ankleBreaker', 6)
+        };
+        const levelFor = name => name === 'speed'
+          ? attributeLevels.speed
+          : attributeLevels[name] ?? powerUpLevels[name];
+        const upgradePurchases = Object.fromEntries(
+          [...attributeNames, ...powerUpNames].map(name => [
+            name,
+            validLevel(savedPurchases[name], upgradeLimits[name]) ?? levelFor(name)
+          ])
+        );
+        return {
+          ...defaults,
+          wins: Number.isSafeInteger(saved.wins) && saved.wins >= 0 ? saved.wins : 0,
+          losses: Number.isSafeInteger(saved.losses) && saved.losses >= 0 ? saved.losses : 0,
+          winStreak: Number.isSafeInteger(saved.winStreak) && saved.winStreak >= 0 ? saved.winStreak : 0,
+          bestWinStreak: Number.isSafeInteger(saved.bestWinStreak) && saved.bestWinStreak >= 0 ? saved.bestWinStreak : 0,
+          coins: Number.isSafeInteger(saved.coins) && saved.coins >= 0 ? saved.coins : 0,
+          salary: Number.isSafeInteger(saved.salary) && saved.salary >= 2
+            ? Math.max(2, Math.min(24, Math.floor(saved.salary / 2) * 2))
+            : 2,
+          attributes: {
+            speed: 2 + attributeLevels.speed * 2,
+            threePoint: 2 + attributeLevels.threePoint,
+            layupDunk: 2 + attributeLevels.layupDunk,
+            steal: attributeLevels.steal,
+            block: attributeLevels.block,
+            blockRange: attributeLevels.blockRange
+          },
+          powerUps: powerUpLevels,
+          upgradePurchases
+        };
+      } catch (error) {
+        console.error('Could not load saved game progress:', error);
+        return defaults;
+      }
+    }
+
+    const fallbackProgression = loadProgression();
+    let progression = fallbackProgression;
+
+    function loadProfileStore() {
+      const emptySlots = Array(4).fill(null);
+      try {
+        const saved = JSON.parse(localStorage.getItem(profileStorageKey) || 'null');
+        if (!saved || typeof saved !== 'object' || !Array.isArray(saved.slots)) {
+          return { slots: emptySlots, selectedSlot: null };
+        }
+        const slots = emptySlots.map((_, index) => {
+          const profile = saved.slots[index];
+          if (!profile || typeof profile !== 'object' || typeof profile.name !== 'string'
+            || !profile.name.trim() || !profile.progression || typeof profile.progression !== 'object') return null;
+          return { name: profile.name.trim().slice(0, 20), progression: loadProgression(profile.progression) };
+        });
+        const selectedSlot = Number.isInteger(saved.selectedSlot)
+          && saved.selectedSlot >= 0
+          && saved.selectedSlot < slots.length
+          && slots[saved.selectedSlot]
+          ? saved.selectedSlot
+          : null;
+        return { slots, selectedSlot };
+      } catch (error) {
+        console.error('Could not load player profiles:', error);
+        return { slots: emptySlots, selectedSlot: null };
+      }
+    }
+
+    const loadedProfiles = loadProfileStore();
+    const profileSlots = loadedProfiles.slots;
+    let selectedProfileSlot = loadedProfiles.selectedSlot;
+    let activeProfileSlot = selectedProfileSlot;
+    let profileDraftSlot = null;
+    let profileDraftName = '';
+    let nameEntrySlot = null;
+    if (activeProfileSlot !== null) {
+      progression = loadProgression(profileSlots[activeProfileSlot].progression);
+    }
+
+    function saveProfileStore() {
+      try {
+        localStorage.setItem(profileStorageKey, JSON.stringify({
+          slots: profileSlots,
+          selectedSlot: selectedProfileSlot
+        }));
+      } catch (error) {
+        console.error('Could not save player profiles:', error);
+      }
+    }
+
+    function saveProgression() {
+      if (profileDraftSlot !== null) return;
+      try {
+        if (activeProfileSlot !== null && profileSlots[activeProfileSlot]) {
+          profileSlots[activeProfileSlot].progression = progression;
+          saveProfileStore();
+          return;
+        }
+        localStorage.setItem(progressStorageKey, JSON.stringify(progression));
+      } catch (error) {
+        console.error('Could not save game progress:', error);
+      }
+    }
+
     const state = {
       player: { x: 0, z: 12, score: 0 },
       cpu: { x: 0, z: 6, score: 0 },
       ball: { x: 0, y: 1.2, z: 12 },
+      playerSprintTime: 0,
+      playerSprintCooldown: 0,
+      cpuSprintTime: 0,
+      cpuSprintCooldown: 0,
+      cpuStealCooldown: 0,
+      playerFrozenTime: 0,
+      cpuFrozenTime: 0,
       playerThreeStreak: 0,
       superDunkReady: false,
+      cpuThreeStreak: 0,
+      cpuSuperDunkReady: false,
+      playerLayupStreak: 0,
+      playerAnkleBreakerReady: false,
+      cpuLayupStreak: 0,
+      cpuAnkleBreakerReady: false,
       posterPauseUntil: 0,
       posterRecipient: '',
       keys: {},
@@ -595,17 +1353,21 @@
       dunkType: '',
       dunkShooter: 'player',
       gameEnded: false,
+      lastSalaryEarned: 0,
+      paused: false,
       replayActive: false,
       replayTimer: 0,
       replayFrames: [],
       randomSeed: Math.random() * 1000,
       lastActionStamp: 0,
-      lastStealAttempt: 0
+      lastStealAttempt: 0,
+      difficulty: 'rookie'
     };
 
     let scene, camera, renderer;
     let animationStarted = false;
     let inputListenersAdded = false;
+    let pauseStartedAt = 0;
     let playerMesh, cpuMesh, ballMesh, hoopGroup;
     let playerRoot, cpuRoot;
     let playerAnim = { leftLeg: null, rightLeg: null, leftArm: null, rightArm: null, torso: null };
@@ -616,25 +1378,136 @@
     const greenMin = 62;
     const greenMax = 86;
     const winTarget = 21;
+    const maxBlockRangeInHeights = 1.5;
+    let gameResultRecorded = false;
+    const bannedPlayerNameWords = [
+      'nigger', 'nigga', 'chink', 'spic', 'kike', 'wetback', 'coon', 'gook', 'fag', 'faggot', 'dyke', 'tranny',
+      'fuck', 'fucking', 'fucked', 'shit', 'shitting', 'bullshit', 'cunt', 'dick', 'cock', 'pussy', 'asshole',
+      'bitch', 'bastard', 'slut', 'whore', 'motherfucker', 'ass', 'piss', 'twat', 'bollocks', 'wanker', 'douchebag'
+    ];
+
+    function normalizePlayerName(name) {
+      return name.toLowerCase()
+        .normalize('NFKD')
+        .replace(/\p{M}/gu, '')
+        .replace(/[0123456789@$!|]/g, character => ({
+          '0': 'o', '1': 'i', '2': 'z', '3': 'e', '4': 'a', '5': 's',
+          '6': 'g', '7': 't', '8': 'b', '9': 'g', '@': 'a', '$': 's', '!': 'i', '|': 'i'
+        })[character])
+        .replace(/[^a-z]/g, '');
+    }
+
+    function isAppropriatePlayerName(name) {
+      const normalized = normalizePlayerName(name);
+      return normalized.length > 0
+        && !bannedPlayerNameWords.some(word => normalized.includes(normalizePlayerName(word)));
+    }
+
+    function hideProfileNameEntry() {
+      document.getElementById('profile-name-form').style.display = 'none';
+      document.getElementById('profile-name-error').style.display = 'none';
+      nameEntrySlot = null;
+    }
+
+    function showProfileNameEntry(slotIndex) {
+      selectedProfileSlot = null;
+      activeProfileSlot = null;
+      progression = fallbackProgression;
+      saveProfileStore();
+      nameEntrySlot = slotIndex;
+      const input = document.getElementById('profile-name-input');
+      input.value = '';
+      document.getElementById('profile-name-error').style.display = 'none';
+      document.getElementById('profile-name-form').style.display = 'block';
+      renderProfileSlots();
+      input.focus();
+    }
+
+    function submitProfileName() {
+      const name = document.getElementById('profile-name-input').value.trim();
+      const error = document.getElementById('profile-name-error');
+      if (!isAppropriatePlayerName(name)) {
+        error.textContent = 'Please choose an appropriate player name.';
+        error.style.display = 'block';
+        return;
+      }
+      if (!window.confirm('Are you sure you want to use this name?')) return;
+
+      profileDraftSlot = nameEntrySlot;
+      profileDraftName = name;
+      activeProfileSlot = null;
+      selectedProfileSlot = null;
+      progression = loadProgression({});
+      hideProfileNameEntry();
+      document.getElementById('loading-screen').style.display = 'none';
+      renderUpgrades();
+      document.getElementById('upgrade-screen').style.display = 'flex';
+    }
+
+    function selectPlayerProfile(slotIndex) {
+      if (!profileSlots[slotIndex]) return;
+      selectedProfileSlot = slotIndex;
+      activeProfileSlot = slotIndex;
+      profileDraftSlot = null;
+      profileDraftName = '';
+      progression = loadProgression(profileSlots[slotIndex].progression);
+      hideProfileNameEntry();
+      saveProfileStore();
+      renderProfileSlots();
+      renderUpgrades();
+    }
+
+    function deleteSelectedProfile() {
+      if (selectedProfileSlot === null || !profileSlots[selectedProfileSlot]) return;
+      if (!window.confirm(`Delete ${profileSlots[selectedProfileSlot].name}'s player profile?`)) return;
+      profileSlots[selectedProfileSlot] = null;
+      selectedProfileSlot = null;
+      activeProfileSlot = null;
+      progression = fallbackProgression;
+      saveProfileStore();
+      renderProfileSlots();
+    }
+
+    function renderProfileSlots() {
+      const container = document.getElementById('profile-slots');
+      if (!container) return;
+      container.replaceChildren();
+      profileSlots.forEach((profile, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `profile-slot${selectedProfileSlot === index ? ' selected' : ''}${profile ? '' : ' profile-slot-empty'}`;
+        button.dataset.slot = String(index);
+        button.textContent = profile ? profile.name : '+';
+        button.setAttribute('aria-label', profile ? `Select ${profile.name} profile` : `Create player in slot ${index + 1}`);
+        button.setAttribute('aria-pressed', String(selectedProfileSlot === index));
+        container.appendChild(button);
+      });
+      document.getElementById('delete-profile-btn').style.display =
+        selectedProfileSlot !== null && profileSlots[selectedProfileSlot] ? 'block' : 'none';
+    }
 
     function startGameIntro() {
       document.getElementById('tipoff-btn').addEventListener('click', () => {
+        state.difficulty = document.getElementById('difficulty-select').value;
         document.getElementById('loading-screen').style.display = 'none';
         const intro = document.getElementById('intro-cinematic');
         const text = document.getElementById('cinematic-text');
         intro.style.display = 'flex';
 
         setTimeout(() => { text.textContent = 'THE TEAMS ARE WALKING OUT...'; }, 1000);
-        setTimeout(() => { text.textContent = 'STEPHEN CURRY IS WARMING UP...'; }, 2200);
+        const playerName = selectedProfileSlot === null ? 'Stephen Curry' : profileSlots[selectedProfileSlot].name;
+        setTimeout(() => { text.textContent = `${playerName.toUpperCase()} IS WARMING UP...`; }, 2200);
         setTimeout(() => { text.textContent = 'TIP-OFF'; }, 3400);
         setTimeout(() => {
           intro.style.display = 'none';
+          state.gameEnded = false;
+          state.paused = false;
           document.getElementById('game-container').style.display = 'block';
           try {
             initGame();
           } catch (error) {
             const message = document.getElementById('graphics-error');
-            message.textContent = `The game could not start its 3D graphics. Check that WebGL is enabled, then refresh. (${error.message})`;
+              message.textContent = `The game could not start its 3D graphics. Check that WebGL and hardware acceleration are enabled in your browser, then refresh. (${error.message})`;
             message.style.display = 'flex';
             console.error('Basketball game initialization failed:', error);
           }
@@ -643,25 +1516,58 @@
       document.getElementById('next-btn').addEventListener('click', () => {
         restartGame();
       });
+      document.getElementById('reset-record-btn').addEventListener('click', resetRecord);
+      document.getElementById('open-upgrades-btn').addEventListener('click', openUpgradeScreen);
+      document.getElementById('next-from-upgrades-btn').addEventListener('click', finishUpgradeScreen);
+      document.getElementById('resume-btn').addEventListener('click', resumeGame);
+      document.querySelectorAll('.upgrade-button').forEach(button => {
+        button.addEventListener('click', () => purchaseUpgrade(button.dataset.upgrade));
+      });
+      document.getElementById('profile-slots').addEventListener('click', event => {
+        const slotButton = event.target.closest('.profile-slot');
+        if (!slotButton) return;
+        const slotIndex = Number(slotButton.dataset.slot);
+        if (profileSlots[slotIndex]) {
+          selectPlayerProfile(slotIndex);
+        } else {
+          showProfileNameEntry(slotIndex);
+        }
+      });
+      document.getElementById('profile-name-form').addEventListener('submit', event => {
+        event.preventDefault();
+        submitProfileName();
+      });
+      document.getElementById('delete-profile-btn').addEventListener('click', deleteSelectedProfile);
+      document.addEventListener('click', event => {
+        if (document.getElementById('profile-name-form').style.display !== 'block') return;
+        if (event.target.closest('#profile-name-form') || event.target.closest('.profile-slot-empty')) return;
+        hideProfileNameEntry();
+      });
+      renderProfileSlots();
+      renderRecord();
     }
 
     function initGame() {
       if (!scene) {
         const container = document.getElementById('canvas-wrap');
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x070707);
-
-        camera = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 25, 48);
-        camera.lookAt(0, 0, -1);
-
-        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer = new THREE.WebGLRenderer({
+          antialias: false,
+          alpha: false,
+          powerPreference: 'low-power'
+        });
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.setSize(container.clientWidth || window.innerWidth, container.clientHeight || window.innerHeight);
         renderer.domElement.style.display = 'block';
         renderer.domElement.style.width = '100%';
         renderer.domElement.style.height = '100%';
         container.appendChild(renderer.domElement);
+
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x070707);
+
+        camera = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 25, 48);
+        camera.lookAt(0, 0, -1);
 
         const hemi = new THREE.HemisphereLight(0xffffff, 0x101010, 1.2);
         scene.add(hemi);
@@ -680,6 +1586,7 @@
       }
 
       updateHud();
+      updateShotGreenZone();
       if (!animationStarted) {
         animate();
         animationStarted = true;
@@ -690,6 +1597,7 @@
         window.addEventListener('keyup', onKeyUp);
         window.addEventListener('resize', onResize);
         document.getElementById('super-dunk-btn').addEventListener('click', startSuperDunk);
+        document.getElementById('ankle-breaker-btn').addEventListener('click', activatePlayerAnkleBreaker);
       }
     }
 
@@ -1069,6 +1977,14 @@
 
     function onKeyDown(event) {
       const key = event.key.toLowerCase();
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        if (!event.repeat && !state.gameEnded && document.getElementById('game-container').style.display === 'block') {
+          state.paused ? resumeGame() : pauseGame();
+        }
+        return;
+      }
+      if (state.paused) return;
       if (state.posterPauseUntil > performance.now()) return;
       state.keys[key] = true;
 
@@ -1080,12 +1996,20 @@
         attemptSteal();
       }
 
+      if (key === 'shift' && !event.repeat) {
+        startPlayerSprint();
+      }
+
       if (key === 'q' && !event.repeat) {
         startDunk();
       }
 
       if (key === 'f' && !event.repeat) {
         startSuperDunk();
+      }
+
+      if (key === 'g' && !event.repeat) {
+        activatePlayerAnkleBreaker();
       }
 
       if (key === 'r' && state.possession === 'cpu' && !state.gameEnded && !state.blockMeterActive) {
@@ -1096,6 +2020,7 @@
     function onKeyUp(event) {
       const key = event.key.toLowerCase();
       state.keys[key] = false;
+      if (state.paused) return;
 
       if (event.code === 'Space' && state.meterActive) {
         releaseShot();
@@ -1109,12 +2034,13 @@
       state.meterActive = true;
       state.meterValue = 0;
       state.meterDirection = 1.8;
+      updateShotGreenZone();
       document.getElementById('shot-meter').style.display = 'block';
       document.getElementById('shot-status').style.opacity = '0';
     }
 
     function releaseShot() {
-      const green = state.meterValue >= greenMin && state.meterValue <= greenMax;
+      const green = isGreenShot(state.meterValue, getShotValue('player') === 3);
       state.meterActive = false;
       document.getElementById('shot-meter').style.display = 'none';
       launchShot('player', green);
@@ -1130,11 +2056,13 @@
       state.blockMeterActive = true;
       state.blockMeterValue = 0;
       state.blockMeterDirection = 1.8;
+      updateBlockGreenZone();
       document.getElementById('block-meter').style.display = 'block';
     }
 
     function releaseBlockMeter() {
-      const green = state.blockMeterValue >= greenMin && state.blockMeterValue <= greenMax;
+      const bounds = getMeterGreenBounds(getBlockGreenWindowWidth());
+      const green = state.blockMeterValue >= bounds.min && state.blockMeterValue <= bounds.max;
       state.blockMeterActive = false;
       document.getElementById('block-meter').style.display = 'none';
       if (!state.shotAnimation || state.shotPhase !== 'flight' || state.shotShooter !== 'cpu') {
@@ -1148,6 +2076,100 @@
       if (!tryBlock('player')) {
         showActionStatus('TOO FAR OR OUT OF POSITION', '#ff4a4a');
       }
+    }
+
+    function getMeterGreenBounds(width) {
+      return { min: 50 - width / 2, max: 50 + width / 2 };
+    }
+
+    function getThreePointGreenWindowWidth() {
+      const level = progression.attributes.threePoint - 2;
+      return 24 + (85 - 24) * level / 18;
+    }
+
+    function getUpgradedBlockGreenWindowWidth() {
+      return 24 + (50 - 24) * progression.attributes.block / upgradeLimits.block;
+    }
+
+    function getBlockGreenWindowWidth() {
+      return getBlockGreenWindowWidthAtDistance(getPlayerCpuDistance());
+    }
+
+    function getBlockGreenWindowWidthAtDistance(distance) {
+      const upgradedWindow = getUpgradedBlockGreenWindowWidth();
+      const distanceInHeights = distance / playerHeight;
+      const upgradedRange = getPlayerBlockRangeInHeights();
+      if (distanceInHeights <= upgradedRange) return upgradedWindow;
+      if (distanceInHeights <= upgradedRange + 1) {
+        return THREE.MathUtils.lerp(upgradedWindow, 20, distanceInHeights - upgradedRange);
+      }
+      if (distanceInHeights <= 3) {
+        return THREE.MathUtils.lerp(20, 10, (distanceInHeights - upgradedRange - 1) / (2 - upgradedRange));
+      }
+      return 5;
+    }
+
+    function getPlayerContestedFinishChance(type) {
+      const baseChance = type === 'dunk' ? 0.55 : 0.75;
+      const progress = (progression.attributes.layupDunk - 2) / 18;
+      return baseChance + (0.9 - baseChance) * progress;
+    }
+
+    function getPlayerStealChance() {
+      return Math.min(0.9, 0.5 + progression.attributes.steal * 0.025);
+    }
+
+    function getPlayerBlockRange() {
+      return playerHeight * getPlayerBlockRangeInHeights();
+    }
+
+    function getPlayerBlockRangeInHeights() {
+      return 0.25 + (maxBlockRangeInHeights - 0.25) * progression.attributes.blockRange / upgradeLimits.blockRange;
+    }
+
+    function getPlayerCpuDistance() {
+      return Math.hypot(state.player.x - state.cpu.x, state.player.z - state.cpu.z);
+    }
+
+    function getCpuDifficulty() {
+      return cpuDifficulties[state.difficulty];
+    }
+
+    function getCpuShotMakeChance(isThreePointShot = getShotValue('cpu') === 3) {
+      const playerDistance = getPlayerCpuDistance();
+      const openShotDistance = 3.2;
+      const pressure = THREE.MathUtils.clamp((openShotDistance - playerDistance) / openShotDistance, 0, 1);
+      const difficulty = getCpuDifficulty();
+      const openChance = isThreePointShot ? difficulty.threePointChance : difficulty.openShotChance;
+      return Math.max(0, openChance - pressure * difficulty.contestedShotPenalty);
+    }
+
+    function getCpuBlockRange() {
+      return playerHeight * getCpuDifficulty().blockRange;
+    }
+
+    function getShotGreenBounds(isThreePointShot) {
+      const width = isThreePointShot ? getThreePointGreenWindowWidth() : 24;
+      return getMeterGreenBounds(width);
+    }
+
+    function isGreenShot(value, isThreePointShot) {
+      const bounds = getShotGreenBounds(isThreePointShot);
+      return value >= bounds.min && value <= bounds.max;
+    }
+
+    function updateShotGreenZone() {
+      const bounds = getShotGreenBounds(getShotValue('player') === 3);
+      const shotZone = document.querySelector('#shot-meter .green-zone');
+      shotZone.style.top = `${100 - bounds.max}%`;
+      shotZone.style.height = `${bounds.max - bounds.min}%`;
+    }
+
+    function updateBlockGreenZone() {
+      const bounds = getMeterGreenBounds(getBlockGreenWindowWidth());
+      const blockZone = document.querySelector('#block-meter .green-zone');
+      blockZone.style.top = `${100 - bounds.max}%`;
+      blockZone.style.height = `${bounds.max - bounds.min}%`;
     }
 
     function showActionStatus(text, color) {
@@ -1193,16 +2215,24 @@
       state.dunkProgress = 0;
       state.dunkType = superDunk ? 'super' : distance <= 5.5 ? 'dunk' : 'layup';
       state.dunkActorOrigin.set(state.player.x, 0, state.player.z);
-      state.superDunkPoints = superDunk ? rollSuperDunkPoints() : 0;
+      state.superDunkPoints = superDunk ? rollSuperDunkPoints('player') : 0;
       const defenderDistance = Math.hypot(state.cpu.x - state.player.x, state.cpu.z - state.player.z);
       const contestDistance = state.dunkType === 'dunk' ? 3.2 : 2.8;
-      const missChance = state.dunkType === 'dunk' ? 0.45 : 0.25;
-      state.dunkMade = superDunk || defenderDistance > contestDistance || Math.random() >= missChance;
+      const contestedMakeChance = getPlayerContestedFinishChance(state.dunkType);
+      state.dunkMade = superDunk || defenderDistance > contestDistance || Math.random() < contestedMakeChance;
       if (superDunk) {
         state.playerThreeStreak = 0;
+        state.playerLayupStreak = 0;
         state.superDunkReady = false;
         updateSuperDunkStatus();
+        updateAnkleBreakerStatus();
       } else {
+        state.playerThreeStreak = 0;
+        updateSuperDunkStatus();
+        if (state.dunkType !== 'layup') {
+          state.playerLayupStreak = 0;
+          updateAnkleBreakerStatus();
+        }
         showActionStatus(state.dunkType === 'dunk' ? 'DUNK' : 'LAYUP', '#fff');
       }
       state.dunkOrigin.set(state.player.x + 0.65, 1.6, state.player.z - 0.45);
@@ -1227,12 +2257,13 @@
       const t = now * 0.01;
       if (state.superDunkReady) updateSuperDunkStatus();
 
-      if (state.posterPauseUntil > 0 && now >= state.posterPauseUntil) {
+      if (!state.paused && state.posterPauseUntil > 0 && now >= state.posterPauseUntil) {
         finishPosterFreeze();
       }
       const posterPaused = state.posterPauseUntil > now;
 
-      if (!posterPaused && !state.gameEnded) {
+      if (!posterPaused && !state.gameEnded && !state.paused) {
+        updateSprintTimers(deltaSeconds);
         updateShotClock(deltaSeconds);
         updatePlayerMovement();
         updateCpuLogic(t);
@@ -1241,7 +2272,7 @@
         updateBlockMeter();
       }
 
-      if (!posterPaused) updateBallAndShot();
+      if (!posterPaused && !state.paused) updateBallAndShot();
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     }
@@ -1262,8 +2293,14 @@
     }
 
     function updatePlayerMovement() {
+      if (state.playerFrozenTime > 0) {
+        playerRoot.position.set(state.player.x, 0, state.player.z);
+        return;
+      }
       const moving = state.keys['w'] || state.keys['s'] || state.keys['a'] || state.keys['d'];
-      const speed = moving && state.possessionResetTimer <= 0 && !state.dunkActive && !state.shotAnimation && !state.blockActive ? 0.24 : 0;
+      const speedUpgrade = 1 + (progression.attributes.speed - 2) * 0.05;
+      const baseSpeed = (state.playerSprintTime > 0 ? 0.42 : 0.24) * speedUpgrade;
+      const speed = moving && state.possessionResetTimer <= 0 && !state.dunkActive && !state.shotAnimation && !state.blockActive ? baseSpeed : 0;
 
       if (state.keys['w']) state.player.z -= speed;
       if (state.keys['s']) state.player.z += speed;
@@ -1284,9 +2321,109 @@
       }
     }
 
+    function startPlayerSprint() {
+      if (state.gameEnded || state.posterPauseUntil > performance.now() || state.playerSprintTime > 0 || state.playerSprintCooldown > 0) return;
+      state.playerSprintTime = 2;
+      state.playerSprintCooldown = 4;
+      updateSprintStatus();
+    }
+
+    function startCpuSprint() {
+      if (state.cpuSprintTime > 0 || state.cpuSprintCooldown > 0) return;
+      state.cpuSprintTime = 2;
+      state.cpuSprintCooldown = 4;
+    }
+
+    function updateSprintTimers(deltaSeconds) {
+      state.playerSprintTime = Math.max(0, state.playerSprintTime - deltaSeconds);
+      state.playerSprintCooldown = Math.max(0, state.playerSprintCooldown - deltaSeconds);
+      state.cpuSprintTime = Math.max(0, state.cpuSprintTime - deltaSeconds);
+      state.cpuSprintCooldown = Math.max(0, state.cpuSprintCooldown - deltaSeconds);
+      state.playerFrozenTime = Math.max(0, state.playerFrozenTime - deltaSeconds);
+      state.cpuFrozenTime = Math.max(0, state.cpuFrozenTime - deltaSeconds);
+      if (state.keys.shift && state.playerSprintTime <= 0 && state.playerSprintCooldown <= 0) {
+        startPlayerSprint();
+      }
+      updateSprintStatus();
+      updateAnkleBreakerStatus();
+    }
+
+    function updateSprintStatus() {
+      const status = document.getElementById('sprint-status');
+      if (!status) return;
+      if (state.playerSprintTime > 0) {
+        status.textContent = `SPRINT ${state.playerSprintTime.toFixed(1)}s`;
+      } else if (state.playerSprintCooldown > 0) {
+        status.textContent = `SPRINT ${state.playerSprintCooldown.toFixed(1)}s COOLDOWN`;
+      } else {
+        status.textContent = 'SPRINT READY';
+      }
+    }
+
+    function updateAnkleBreakerStatus() {
+      const button = document.getElementById('ankle-breaker-btn');
+      if (!button) return;
+      const available = state.playerAnkleBreakerReady
+        && state.possession === 'player'
+        && state.possessionResetTimer <= 0
+        && !state.shotAnimation
+        && !state.dunkActive
+        && !state.blockActive
+        && !state.gameEnded;
+      button.disabled = !available;
+      button.classList.toggle('ready', available);
+      button.setAttribute('aria-label', available ? 'Ankle breaker ready, press G' : 'Ankle breaker charge');
+      const pips = document.querySelectorAll('#ankle-breaker-btn + .super-dunk-charge span');
+      const charge = state.playerAnkleBreakerReady ? 5 : Math.min(state.playerLayupStreak, 5);
+      pips.forEach((pip, index) => pip.classList.toggle('filled', index < charge));
+    }
+
+    function activatePlayerAnkleBreaker() {
+      if (!state.playerAnkleBreakerReady || state.possession !== 'player' || state.possessionResetTimer > 0 || state.gameEnded || state.shotAnimation || state.dunkActive || state.blockActive) return;
+      const ankleLevel = progression.powerUps.ankleBreaker;
+      const duration = ankleLevel === 0 ? 2 + Math.random() * 2 : Math.min(10, 4 + ankleLevel);
+      state.cpuFrozenTime = duration;
+      state.playerAnkleBreakerReady = false;
+      resetLayupStreak('player');
+      showActionStatus(`ANKLE BREAKER ${duration.toFixed(1)}s`, '#ff9900');
+    }
+
+    function activateCpuAnkleBreaker() {
+      if (!state.cpuAnkleBreakerReady || state.possession !== 'cpu' || state.possessionResetTimer > 0 || state.gameEnded || state.shotAnimation || state.dunkActive || state.blockActive) return;
+      const duration = 2 + Math.random() * 2;
+      state.playerFrozenTime = duration;
+      state.cpuAnkleBreakerReady = false;
+      resetLayupStreak('cpu');
+      showActionStatus(`CPU ANKLE BREAKER ${duration.toFixed(1)}s`, '#ff4a4a');
+    }
+
+    function resetLayupStreak(shooter) {
+      state[`${shooter}LayupStreak`] = 0;
+      if (shooter === 'player') updateAnkleBreakerStatus();
+    }
+
+    function recordLayupMake(shooter, isLayup) {
+      if (!isLayup) {
+        resetLayupStreak(shooter);
+        return;
+      }
+      const streakKey = `${shooter}LayupStreak`;
+      state[streakKey] += 1;
+      if (state[streakKey] >= 5 && (shooter === 'player' || getCpuDifficulty().powerUpChance > 0)) {
+        state[`${shooter}AnkleBreakerReady`] = true;
+      }
+      if (shooter === 'player') updateAnkleBreakerStatus();
+    }
+
     function updateCpuLogic(t) {
       if (state.defenderDelay > 0) {
         state.defenderDelay -= 0.016;
+      }
+      state.cpuStealCooldown = Math.max(0, state.cpuStealCooldown - 0.016);
+
+      if (state.cpuFrozenTime > 0) {
+        cpuRoot.position.set(state.cpu.x, 0, state.cpu.z);
+        return;
       }
 
       if (state.possessionResetTimer > 0) {
@@ -1313,8 +2450,10 @@
         const guardDistance = Math.min(3.2, hoopDistance * 0.55);
         const guardX = state.player.x + towardHoopX / hoopDistance * guardDistance;
         const guardZ = state.player.z + towardHoopZ / hoopDistance * guardDistance;
-        const guardSpeed = state.defenderDelay > 0 ? 0.17 : 0.23;
+        const defenseSpeed = getCpuDifficulty().defenseSpeed;
+        const guardSpeed = state.defenderDelay > 0 ? defenseSpeed * 0.7 : defenseSpeed;
         moveCpuToward(guardX, guardZ, guardSpeed);
+        if (attemptCpuSteal()) return;
         state.cpu.x = THREE.MathUtils.clamp(state.cpu.x, -15.8, 15.8);
         state.cpu.z = THREE.MathUtils.clamp(state.cpu.z, courtBounds.minZ, courtBounds.maxZ);
       }
@@ -1343,7 +2482,31 @@
     function updateCpuOffense() {
       if (!state.cpuPlan) state.cpuPlan = createCpuPlan();
       const plan = state.cpuPlan;
-      moveCpuToward(plan.target.x, plan.target.z, 0.24);
+      const difficulty = getCpuDifficulty();
+      if (state.cpuAnkleBreakerReady && Math.random() < difficulty.powerUpChance) {
+        activateCpuAnkleBreaker();
+        return;
+      }
+      const playerDistance = Math.hypot(state.player.x - state.cpu.x, state.player.z - state.cpu.z);
+      if (state.cpuSprintTime <= 0 && state.cpuSprintCooldown <= 0
+        && playerDistance < difficulty.sprintDistance && Math.random() < difficulty.sprintChance) {
+        startCpuSprint();
+        const awayX = state.cpu.x - state.player.x;
+        const awayZ = state.cpu.z - state.player.z;
+        const awayDistance = Math.hypot(awayX, awayZ) || 1;
+        plan.type = 'outside-three';
+        plan.target = {
+          x: THREE.MathUtils.clamp(state.cpu.x + awayX / awayDistance * 7, -15.8, 15.8),
+          z: THREE.MathUtils.clamp(state.cpu.z + awayZ / awayDistance * 7, courtBounds.minZ, courtBounds.maxZ)
+        };
+      }
+      if (state.cpuSuperDunkReady && Math.random() < difficulty.powerUpChance) {
+        state.cpuPlan = null;
+        startCpuFinish('super', true);
+        return;
+      }
+      const movementSpeed = state.cpuSprintTime > 0 ? difficulty.sprintSpeed : difficulty.offenseSpeed;
+      moveCpuToward(plan.target.x, plan.target.z, movementSpeed);
       const distanceToTarget = Math.hypot(plan.target.x - state.cpu.x, plan.target.z - state.cpu.z);
       if (distanceToTarget > 1.15 || state.cpuShotCooldown > 0) return;
 
@@ -1361,22 +2524,27 @@
       }
 
       const shotDistance = Math.hypot(state.cpu.x, state.cpu.z - hoopZ);
-      const greenChance = shotDistance > 23 ? 0.14 : shotDistance > 15.2 ? 0.34 : shotDistance > 11.2 ? 0.42 : 0.52;
-      launchShot('cpu', Math.random() < greenChance);
+      launchShot('cpu', Math.random() < getCpuShotMakeChance());
     }
 
-    function startCpuFinish(type) {
+    function startCpuFinish(type, superDunk = false) {
       state.dunkActive = true;
       state.dunkShooter = 'cpu';
-      state.dunkType = type;
+      state.dunkType = superDunk ? 'super' : type;
       state.dunkPhase = 'flight';
       state.dunkProgress = 0;
       state.dunkActorOrigin.set(state.cpu.x, 0, state.cpu.z);
+      state.superDunkPoints = superDunk ? rollSuperDunkPoints('cpu') : 0;
       state.dunkOrigin.set(state.cpu.x + 0.3, 1.6, state.cpu.z - 0.45);
-      const defenderDistance = Math.hypot(state.player.x - state.cpu.x, state.player.z - state.cpu.z);
-      const contestDistance = type === 'dunk' ? 3.2 : 2.8;
-      const missChance = type === 'dunk' ? 0.45 : 0.25;
-      state.dunkMade = defenderDistance > contestDistance || Math.random() >= missChance;
+      state.dunkMade = superDunk || Math.random() < getCpuShotMakeChance(false);
+      if (superDunk) {
+        state.cpuThreeStreak = 0;
+        state.cpuSuperDunkReady = false;
+      }
+      if (superDunk || type !== 'layup') {
+        state.cpuThreeStreak = 0;
+        state.cpuLayupStreak = 0;
+      }
       ballMesh.position.copy(state.dunkOrigin);
       state.canShoot = false;
     }
@@ -1394,10 +2562,21 @@
       state.cpu.z += dz / distance * speed;
     }
 
+    function attemptCpuSteal() {
+      if (state.possession !== 'player' || state.cpuStealCooldown > 0
+        || state.possessionResetTimer > 0 || state.shotAnimation || state.dunkActive || state.blockActive) return false;
+      const distance = getPlayerCpuDistance();
+      if (distance > 2.9 + getCpuDifficulty().defenseSpeed * 1.5) return false;
+      state.cpuStealCooldown = 1.5;
+      if (Math.random() >= getCpuDifficulty().stealChance) return false;
+      awardPossession('cpu', '', 'player');
+      return true;
+    }
+
     function animateCharacterPose(t) {
-      const playerMoving = state.keys['w'] || state.keys['s'] || state.keys['a'] || state.keys['d'];
+      const playerMoving = state.playerFrozenTime <= 0 && (state.keys['w'] || state.keys['s'] || state.keys['a'] || state.keys['d']);
       const playerWalk = playerMoving ? Math.sin(t * 5.2) * 0.5 : 0;
-      const cpuWalk = state.possession === 'cpu' ? Math.sin(t * 5.2) * 0.55 : Math.sin(t * 4) * 0.2;
+      const cpuWalk = state.cpuFrozenTime > 0 ? 0 : state.possession === 'cpu' ? Math.sin(t * 5.2) * 0.55 : Math.sin(t * 4) * 0.2;
 
       playerAnim.leftLeg.rotation.x = playerMoving ? playerWalk : 0;
       playerAnim.rightLeg.rotation.x = playerMoving ? -playerWalk : 0;
@@ -1414,12 +2593,13 @@
       cpuAnim.rightLeg.rotation.x = -cpuWalk;
       cpuAnim.leftArm.rotation.x = -cpuWalk * 0.85;
       cpuAnim.rightArm.rotation.x = cpuWalk * 0.85;
-      cpuAnim.torso.rotation.x = state.possession === 'cpu' ? 0.08 : 0;
+      cpuAnim.torso.rotation.x = state.cpuFrozenTime > 0 ? 0 : state.possession === 'cpu' ? 0.08 : 0;
       cpuAnim.torso.rotation.z = -state.cpu.x * 0.02;
     }
 
     function updateShotMeter() {
       if (!state.meterActive) return;
+      updateShotGreenZone();
       state.meterValue += state.meterDirection * 2.7;
       if (state.meterValue >= 100 || state.meterValue <= 0) {
         state.meterDirection *= -1;
@@ -1430,6 +2610,7 @@
 
     function updateBlockMeter() {
       if (!state.blockMeterActive) return;
+      updateBlockGreenZone();
       state.blockMeterValue += state.blockMeterDirection * 2.7;
       if (state.blockMeterValue >= 100 || state.blockMeterValue <= 0) {
         state.blockMeterDirection *= -1;
@@ -1445,7 +2626,10 @@
       const isOpponentShot = (defender === 'player' && state.shotShooter === 'cpu')
         || (defender === 'cpu' && state.shotShooter === 'player');
       const distance = Math.hypot(blocker.x - shooter.x, blocker.z - shooter.z);
-      if (!isOpponentShot || distance > 4.2) return false;
+      const blockRange = defender === 'player'
+        ? getPlayerBlockRange()
+        : getCpuBlockRange();
+      if (!isOpponentShot || distance > blockRange) return false;
 
       state.blockActive = true;
       state.blockProgress = 0;
@@ -1455,9 +2639,11 @@
       state.shotPhase = '';
       state.shotGreen = false;
       state.isBallInAir = false;
+      state[`${state.shotShooter}ThreeStreak`] = 0;
+      state[`${state.shotShooter}LayupStreak`] = 0;
       if (state.shotShooter === 'player') {
-        state.playerThreeStreak = 0;
         updateSuperDunkStatus();
+        updateAnkleBreakerStatus();
       }
       ballMesh.position.copy(state.blockPosition);
       showActionStatus('BLOCKED!', '#47ff78');
@@ -1506,6 +2692,7 @@
               const scorer = state.dunkShooter;
               const points = state.dunkType === 'super' ? state.superDunkPoints : 2;
               state[scorer].score += points;
+              recordLayupMake(scorer, state.dunkType === 'layup');
               if (scorer === 'player' && state.dunkType !== 'super') {
                 state.playerThreeStreak = 0;
                 updateSuperDunkStatus();
@@ -1518,13 +2705,14 @@
                 state.dunkPhase = '';
                 state.dunkProgress = 0;
                 state.canShoot = true;
-                playerRoot.position.y = 0;
+                dunkerRoot.position.y = 0;
                 triggerPosterFreeze();
                 return;
               }
               state.dunkPhase = 'net';
               ballMesh.position.set(0, 6.35, hoopZ);
             } else {
+              resetLayupStreak(state.dunkShooter);
               showActionStatus(`${state.dunkType === 'layup' ? 'LAYUP' : 'DUNK'} MISSED`, '#ff4a4a');
               state.dunkPhase = 'miss';
               ballMesh.position.set(1.8, 6.35, hoopZ);
@@ -1532,7 +2720,8 @@
             state.dunkProgress = 0;
           }
         } else if (state.dunkPhase === 'net') {
-          playerRoot.position.y = 0;
+          const dunkerRoot = state.dunkShooter === 'player' ? playerRoot : cpuRoot;
+          dunkerRoot.position.y = 0;
           ballMesh.position.set(0, THREE.MathUtils.lerp(6.35, 4.25, p), hoopZ);
           ballMesh.rotation.x += 0.1;
           if (p >= 1) {
@@ -1572,9 +2761,9 @@
         if (state.shotPhase === 'flight') {
           if (state.shotShooter === 'player' && !state.cpuBlockAttempted) {
             const cpuDistance = Math.hypot(state.cpu.x - state.player.x, state.cpu.z - state.player.z);
-            if (state.shotProgress >= 0.2 && cpuDistance <= 4.2) {
+            if (state.shotProgress >= 0.2 && cpuDistance <= getCpuBlockRange()) {
               state.cpuBlockAttempted = true;
-              if (Math.random() < 0.25 && tryBlock('cpu')) return;
+              if (Math.random() < getCpuDifficulty().blockChance && tryBlock('cpu')) return;
             }
           }
           ballMesh.position.x = THREE.MathUtils.lerp(state.shotOrigin.x, state.shotEndpoint.x, p);
@@ -1634,9 +2823,16 @@
         updateSuperDunkStatus();
       } else {
         state.cpu.score += state.shotValue;
+        state.cpuThreeStreak = state.shotValue === 3 ? state.cpuThreeStreak + 1 : 0;
+        if (state.cpuThreeStreak >= 2 && getCpuDifficulty().powerUpChance > 0) {
+          state.cpuSuperDunkReady = true;
+        }
+        state.cpuLayupStreak = 0;
       }
+      state.playerLayupStreak = state.shotShooter === 'player' ? 0 : state.playerLayupStreak;
       state.isBallInAir = false;
       state.shotGreen = false;
+      updateAnkleBreakerStatus();
       updateHud();
       if (Math.random() < 0.8) showReplay();
       checkWinCondition();
@@ -1662,9 +2858,11 @@
       state.blockMeterActive = false;
       state.blockActive = false;
       state.blockProgress = 0;
+      state[`${state.shotShooter}ThreeStreak`] = 0;
+      state[`${state.shotShooter}LayupStreak`] = 0;
       if (state.shotShooter === 'player') {
-        state.playerThreeStreak = 0;
         updateSuperDunkStatus();
+        updateAnkleBreakerStatus();
       }
       document.getElementById('shot-meter').style.display = 'none';
       document.getElementById('block-meter').style.display = 'none';
@@ -1706,6 +2904,7 @@
       state.ball.z = receiver.z - 0.7;
       ballMesh.position.set(state.ball.x, state.ball.y, state.ball.z);
       updateSuperDunkStatus();
+      updateAnkleBreakerStatus();
     }
 
     function updateSuperDunkStatus() {
@@ -1720,13 +2919,16 @@
       button.disabled = !available;
       button.classList.toggle('ready', available);
       button.setAttribute('aria-label', available ? 'Super dunk ready, press F' : 'Super dunk charge');
-      const pips = document.querySelectorAll('.super-dunk-charge span');
-      pips.forEach((pip, index) => pip.classList.toggle('filled', index < Math.min(state.playerThreeStreak, 2)));
+      const pips = document.querySelectorAll('#super-dunk-btn + .super-dunk-charge span');
+      const charge = state.superDunkReady ? 2 : Math.min(state.playerThreeStreak, 2);
+      pips.forEach((pip, index) => pip.classList.toggle('filled', index < charge));
     }
 
-    function rollSuperDunkPoints() {
+    function rollSuperDunkPoints(shooter) {
       const roll = Math.random();
-      return roll >= 0.95 ? 10 : Math.floor(roll / 0.95 * 9) + 1;
+      const minimum = shooter === 'player' ? Math.min(10, progression.powerUps.superDunk + 1) : 1;
+      const points = roll >= 0.95 ? 10 : Math.floor(roll / 0.95 * 9) + 1;
+      return Math.max(minimum, points);
     }
 
     function showReplay() {
@@ -1750,7 +2952,7 @@
       const dist = Math.hypot(dx, dz);
       if (dist > 2.2) return;
 
-      const success = Math.random() < 0.5;
+      const success = Math.random() < getPlayerStealChance();
       if (success) {
         awardPossession('player', '', 'cpu');
         return;
@@ -1773,23 +2975,230 @@
     }
 
     function finishGame() {
+      if (state.gameEnded) return;
       state.gameEnded = true;
+      state.paused = false;
+      gameResultRecorded = true;
+      const won = state.player.score > state.cpu.score;
+      if (won) {
+        progression.wins += 1;
+        progression.winStreak += 1;
+        progression.bestWinStreak = Math.max(progression.bestWinStreak, progression.winStreak);
+      } else {
+        progression.losses += 1;
+        progression.winStreak = 0;
+      }
+      const salaryEarned = won ? progression.salary : getSalaryLossPayout();
+      state.lastSalaryEarned = salaryEarned;
+      progression.coins += salaryEarned;
+      saveProgression();
+      renderRecord();
       updateSuperDunkStatus();
+      updateAnkleBreakerStatus();
       const result = state.player.score > state.cpu.score ? 'YOU WON' : 'YOU LOST';
       const summary = `Final score: ${state.player.score} - ${state.cpu.score}`;
       document.getElementById('result-title').textContent = result;
       document.getElementById('result-summary').textContent = summary;
+      document.getElementById('record-summary').textContent = `WINS ${progression.wins}  —  LOSSES ${progression.losses}`;
+      document.getElementById('progress-summary').textContent =
+        `${progression.coins} coins in bank · ${salaryEarned} earned this game · ${progression.winStreak} game win streak`;
       document.getElementById('end-screen').style.display = 'flex';
+    }
+
+    function pauseGame() {
+      state.paused = true;
+      pauseStartedAt = performance.now();
+      state.keys = {};
+      document.getElementById('pause-screen').style.display = 'flex';
+    }
+
+    function resumeGame() {
+      state.paused = false;
+      if (state.posterPauseUntil > 0) state.posterPauseUntil += performance.now() - pauseStartedAt;
+      pauseStartedAt = 0;
+      state.keys = {};
+      state.lastFrameTime = performance.now();
+      document.getElementById('pause-screen').style.display = 'none';
+    }
+
+    function renderRecord() {
+      document.getElementById('record-summary').textContent = `WINS ${progression.wins}  —  LOSSES ${progression.losses}`;
+    }
+
+    function resetRecord() {
+      progression.wins = 0;
+      progression.losses = 0;
+      progression.winStreak = 0;
+      progression.bestWinStreak = 0;
+      saveProgression();
+      renderRecord();
+      if (state.gameEnded) {
+        document.getElementById('progress-summary').textContent =
+          `${progression.coins} coins in bank · ${state.lastSalaryEarned} earned this game · ${progression.winStreak} game win streak`;
+      }
+    }
+
+    function getUpgradeCost(name) {
+      if (name === 'salary') return 6;
+      if (name === 'superDunk' || name === 'ankleBreaker') return 8;
+      return progression.upgradePurchases[name] < 5 ? 4 : 8;
+    }
+
+    function getUpgradeLevel(name) {
+      if (name === 'salary') return progression.salary / 2 - 1;
+      if (attributeNames.includes(name)) {
+        if (name === 'speed') return (progression.attributes.speed - 2) / 2;
+        if (name === 'threePoint' || name === 'layupDunk') return progression.attributes[name] - 2;
+        return progression.attributes[name];
+      }
+      return progression.powerUps[name];
+    }
+
+    function getUpgradeMaximum(name) {
+      return upgradeLimits[name];
+    }
+
+    function getSalaryLossPayout() {
+      return Math.round(2 + (progression.salary - 2) / (24 - 2) * 6);
+    }
+
+    function openUpgradeScreen() {
+      renderUpgrades();
+      document.getElementById('end-screen').style.display = 'none';
+      document.getElementById('upgrade-screen').style.display = 'flex';
+    }
+
+    function finishUpgradeScreen() {
+      if (profileDraftSlot === null) {
+        restartGame();
+        return;
+      }
+      profileSlots[profileDraftSlot] = {
+        name: profileDraftName,
+        progression
+      };
+      selectedProfileSlot = profileDraftSlot;
+      activeProfileSlot = profileDraftSlot;
+      profileDraftSlot = null;
+      profileDraftName = '';
+      saveProgression();
+      saveProfileStore();
+      hideProfileNameEntry();
+      document.getElementById('upgrade-screen').style.display = 'none';
+      document.getElementById('loading-screen').style.display = 'flex';
+      document.getElementById('end-screen').style.display = 'none';
+      renderProfileSlots();
+    }
+
+    function renderUpgrades() {
+      const profileName = profileDraftSlot !== null
+        ? profileDraftName
+        : selectedProfileSlot === null
+          ? ''
+          : profileSlots[selectedProfileSlot].name;
+      const nameDisplay = document.getElementById('upgrade-player-name');
+      nameDisplay.textContent = profileName;
+      nameDisplay.style.display = profileName ? 'block' : 'none';
+      document.getElementById('upgrade-wallet').textContent =
+        `${progression.coins} coins · ${progression.salary} coins per win`;
+      document.getElementById('upgrade-lock-note').textContent =
+        'UPGRADE YOUR WARRIORS · Attributes cost 4 coins for the first five upgrades, then 8 coins. Power-ups cost 8 coins.';
+      const stealChance = getPlayerStealChance() * 100;
+      const threePointWindow = getThreePointGreenWindowWidth();
+      const contestedLayupChance = getPlayerContestedFinishChance('layup') * 100;
+      const contestedDunkChance = getPlayerContestedFinishChance('dunk') * 100;
+      const blockWindow = getUpgradedBlockGreenWindowWidth();
+      const blockRangeInHeights = getPlayerBlockRangeInHeights();
+      const attributeDisplay = [
+        ['speed', progression.attributes.speed, progression.attributes.speed / 20],
+        ['threePoint', progression.attributes.threePoint, progression.attributes.threePoint / 20],
+        ['layupDunk', progression.attributes.layupDunk, progression.attributes.layupDunk / 20],
+        ['steal', `${stealChance}%`, stealChance / 90],
+        ['block', `${Math.round(blockWindow)}%`, blockWindow / 50],
+        ['blockRange', `${blockRangeInHeights.toFixed(2)}x`, blockRangeInHeights / maxBlockRangeInHeights]
+      ];
+      attributeDisplay.forEach(([name, rating, fill]) => {
+        document.getElementById(`rating-${name}`).textContent = String(rating);
+        document.getElementById(`bar-${name}`).style.width = `${Math.min(100, Number(fill) * 100)}%`;
+      });
+      document.getElementById('detail-speed').textContent =
+        `Movement x${(1 + (progression.attributes.speed - 2) * 0.05).toFixed(2)}`;
+      document.getElementById('detail-threePoint').textContent = `${Math.round(threePointWindow)}% green window`;
+      document.getElementById('detail-layupDunk').textContent =
+        `${Math.round(contestedLayupChance)}% layup · ${Math.round(contestedDunkChance)}% dunk`;
+      document.getElementById('detail-steal').textContent = `${stealChance}% success chance`;
+      document.getElementById('detail-block').textContent = `${Math.round(blockWindow)}% green window`;
+      document.getElementById('detail-blockRange').textContent =
+        `${blockRangeInHeights.toFixed(2)}x player height · max ${maxBlockRangeInHeights}x`;
+      document.getElementById('player-overall').textContent = String(Math.round(
+        (progression.attributes.speed / 20
+          + progression.attributes.threePoint / 20
+          + progression.attributes.layupDunk / 20
+          + stealChance / 90
+          + blockWindow / 50
+          + blockRangeInHeights / maxBlockRangeInHeights) / 6 * 99
+      ));
+      document.getElementById('super-dunk-level').textContent =
+        `Minimum score: ${progression.powerUps.superDunk + 1} / 10`;
+      document.getElementById('ankle-level').textContent = progression.powerUps.ankleBreaker === 0
+        ? 'Stun duration: 2–4 seconds'
+        : `Stun duration: ${4 + progression.powerUps.ankleBreaker} seconds`;
+      document.getElementById('salary-level').textContent =
+        `Earn ${progression.salary} coins for a win; losses pay ${getSalaryLossPayout()} coins.`;
+      document.getElementById('super-dunk-detail').textContent =
+        `Upgrade by 1 point each level · ${Math.max(0, 9 - progression.powerUps.superDunk)} upgrades to max`;
+      document.getElementById('ankle-detail').textContent =
+        `First upgrade sets 5 seconds · max 10 seconds`;
+      document.getElementById('salary-detail').textContent =
+        `Win: up to 24 coins · loss: ${getSalaryLossPayout()} coins (max 8) · upgrades cost 6 coins`;
+      document.querySelectorAll('.upgrade-button').forEach(button => {
+        const name = button.dataset.upgrade;
+        const cost = getUpgradeCost(name);
+        const atLimit = getUpgradeLevel(name) >= getUpgradeMaximum(name);
+        button.textContent = atLimit ? 'MAX LEVEL' : `UPGRADE · ${cost} COINS`;
+        button.disabled = atLimit || progression.coins < cost;
+      });
+    }
+
+    function purchaseUpgrade(name) {
+      if (![...attributeNames, ...powerUpNames, 'salary'].includes(name)) return;
+      if (getUpgradeLevel(name) >= getUpgradeMaximum(name)) return;
+      const cost = getUpgradeCost(name);
+      if (progression.coins < cost) return;
+      progression.coins -= cost;
+      if (name === 'salary') {
+        progression.salary = Math.min(24, progression.salary + 2);
+      } else if (attributeNames.includes(name)) {
+        if (name === 'speed') {
+          progression.attributes.speed = Math.min(20, progression.attributes.speed + 2);
+        } else if (name === 'threePoint' || name === 'layupDunk') {
+          progression.attributes[name] = Math.min(20, progression.attributes[name] + 1);
+        } else {
+          progression.attributes[name] += 1;
+        }
+        progression.upgradePurchases[name] += 1;
+      } else {
+        progression.powerUps[name] += 1;
+        progression.upgradePurchases[name] += 1;
+      }
+      saveProgression();
+      updateShotGreenZone();
+      updateBlockGreenZone();
+      renderUpgrades();
+      document.getElementById('upgrade-wallet').textContent =
+        `${progression.coins} coins · ${progression.salary} coins per win`;
     }
 
     function triggerPosterFreeze() {
       state.posterPauseUntil = performance.now() + 4000;
-      state.posterRecipient = 'cpu';
+      state.posterRecipient = state.dunkShooter === 'player' ? 'cpu' : 'player';
       state.keys = {};
-      state.cpu.x = 1.1;
-      state.cpu.z = hoopZ + 1.4;
-      cpuRoot.position.set(state.cpu.x, 0.15, state.cpu.z);
-      cpuRoot.rotation.set(Math.PI / 2, 0, 0);
+      const defender = state.posterRecipient === 'cpu' ? state.cpu : state.player;
+      const defenderRoot = state.posterRecipient === 'cpu' ? cpuRoot : playerRoot;
+      defender.x = state.dunkShooter === 'player' ? 1.1 : -1.1;
+      defender.z = hoopZ + 1.4;
+      defenderRoot.position.set(defender.x, 0.15, defender.z);
+      defenderRoot.rotation.set(Math.PI / 2, 0, 0);
       document.getElementById('poster-overlay').style.display = 'flex';
     }
 
@@ -1797,18 +3206,36 @@
       state.posterPauseUntil = 0;
       document.getElementById('poster-overlay').style.display = 'none';
       cpuRoot.rotation.set(0, 0, 0);
+      playerRoot.rotation.set(0, 0, 0);
       const recipient = state.posterRecipient;
       state.posterRecipient = '';
       if (recipient && !state.gameEnded) {
-        awardPossession(recipient, 'player');
+        awardPossession(recipient, recipient === 'cpu' ? 'player' : 'cpu');
       } else {
         cpuRoot.position.set(state.cpu.x, 0, state.cpu.z);
       }
     }
 
     function restartGame() {
+      if (!gameResultRecorded) return;
+      gameResultRecorded = false;
       state.player.score = 0;
       state.cpu.score = 0;
+      state.playerThreeStreak = 0;
+      state.superDunkReady = false;
+      state.cpuThreeStreak = 0;
+      state.cpuSuperDunkReady = false;
+      state.playerLayupStreak = 0;
+      state.playerAnkleBreakerReady = false;
+      state.cpuLayupStreak = 0;
+      state.cpuAnkleBreakerReady = false;
+      state.playerSprintTime = 0;
+      state.playerSprintCooldown = 0;
+      state.cpuSprintTime = 0;
+      state.cpuSprintCooldown = 0;
+      state.cpuStealCooldown = 0;
+      state.playerFrozenTime = 0;
+      state.cpuFrozenTime = 0;
       state.possession = 'player';
       state.possessionResetTimer = 0;
       state.shotClock = 24;
@@ -1846,8 +3273,11 @@
       state.defenderDelay = 0;
       state.isBallInAir = false;
       state.canShoot = true;
-      state.gameEnded = false;
+      state.gameEnded = true;
+      state.paused = false;
       document.getElementById('end-screen').style.display = 'none';
+      document.getElementById('upgrade-screen').style.display = 'none';
+      document.getElementById('pause-screen').style.display = 'none';
       document.getElementById('loading-screen').style.display = 'flex';
       document.getElementById('game-container').style.display = 'none';
       document.getElementById('replay-overlay').style.display = 'none';
@@ -1856,6 +3286,8 @@
       document.querySelector('#shot-meter .meter-fill').style.height = '0%';
       document.querySelector('#block-meter .meter-fill').style.height = '0%';
       updateSuperDunkStatus();
+      updateAnkleBreakerStatus();
+      updateSprintStatus();
       ballMesh.position.set(0.8, 1.3, 11.3);
       document.getElementById('shot-clock').textContent = '24';
       updateHud();
