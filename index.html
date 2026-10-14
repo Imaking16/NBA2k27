@@ -138,7 +138,8 @@
     }
 
     #super-dunk-btn,
-    #ankle-breaker-btn {
+    #ankle-breaker-btn,
+    #pass-switch-btn {
       width: 42px;
       height: 42px;
       border: 1px solid rgba(255,255,255,0.24);
@@ -151,7 +152,8 @@
     }
 
     #super-dunk-btn.ready:not(:disabled),
-    #ankle-breaker-btn.ready:not(:disabled) {
+    #ankle-breaker-btn.ready:not(:disabled),
+    #pass-switch-btn.ready:not(:disabled) {
       background: var(--gold);
       color: #111;
       cursor: pointer;
@@ -673,7 +675,24 @@
       letter-spacing: 0.6px;
     }
 
-    #difficulty-select {
+    #mode-control {
+      position: fixed;
+      top: 22px;
+      right: 215px;
+      z-index: 2;
+      display: grid;
+      gap: 6px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      background: rgba(12,12,12,0.88);
+      color: var(--muted);
+      font: 700 0.75rem Arial, sans-serif;
+      letter-spacing: 0.6px;
+    }
+
+    #difficulty-select,
+    #game-mode-select {
       min-width: 155px;
       padding: 7px 9px;
       border: 1px solid rgba(255,153,0,0.6);
@@ -721,6 +740,29 @@
       box-shadow: 0 0 14px rgba(255,228,0,0.75);
     }
 
+    .profile-slot.lineup-selected {
+      border-color: #47ff78;
+      box-shadow: 0 0 14px rgba(71,255,120,0.65);
+    }
+
+    .profile-slot.lineup-selected.selected {
+      border-color: #ffe400;
+      box-shadow: 0 0 16px rgba(255,228,0,0.82);
+    }
+
+    #roster-selection-hint {
+      position: fixed;
+      left: 50%;
+      bottom: 91px;
+      z-index: 3;
+      width: min(500px, 94vw);
+      color: #dfe3e8;
+      font: 700 0.76rem Arial, sans-serif;
+      text-align: center;
+      text-shadow: 0 2px 5px #000;
+      transform: translateX(-50%);
+    }
+
     #profile-name-form {
       position: fixed;
       left: 50%;
@@ -766,6 +808,151 @@
       color: #ff7777;
       font-size: 1.4rem;
       cursor: pointer;
+    }
+
+    #upgrade-profile-btn {
+      position: fixed;
+      top: 76px;
+      left: 20px;
+      z-index: 4;
+      display: none;
+      padding: 10px 13px;
+      border: 1px solid rgba(255,153,0,0.7);
+      border-radius: 8px;
+      background: rgba(18,18,18,0.94);
+      color: var(--gold);
+      font: 700 0.82rem Arial, sans-serif;
+      cursor: pointer;
+    }
+
+    #team-roster-hud {
+      position: absolute;
+      right: 16px;
+      top: 84px;
+      z-index: 25;
+      max-width: 240px;
+      padding: 9px 12px;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 8px;
+      background: rgba(0,0,0,0.72);
+      color: var(--muted);
+      font: 0.76rem/1.5 Arial, sans-serif;
+      white-space: pre-line;
+    }
+
+    #spin-wheel-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(4,2,16,0.93);
+    }
+
+    #spin-wheel-box {
+      width: min(440px, 94vw);
+      padding: 26px;
+      border: 4px solid #ff4fd8;
+      border-radius: 22px;
+      background: radial-gradient(circle, #331373, #12072c 72%);
+      box-shadow: 0 0 20px #ff4fd8, 0 0 48px #3df7ff;
+      text-align: center;
+      animation: wheelGlow 0.65s infinite alternate;
+    }
+
+    #spin-wheel-box h2 {
+      margin: 0 0 8px;
+      color: #ffe94a;
+      font-size: 2rem;
+    }
+
+    #spin-wheel-box.wheel-tick { border-color: #3df7ff; }
+
+    #spin-wheel {
+      position: relative;
+      width: min(280px, 70vw);
+      aspect-ratio: 1;
+      margin: 20px auto;
+      border: 8px solid #fff;
+      border-radius: 50%;
+      background: conic-gradient(#ffdf35 0deg 180deg, #ff3fb4 180deg 360deg);
+      box-shadow: 0 0 22px #39f6ff, inset 0 0 20px rgba(0,0,0,0.45);
+      transition: transform 3.8s cubic-bezier(0.12, 0.72, 0.08, 1);
+    }
+
+    #spin-wheel::before,
+    #spin-wheel::after {
+      position: absolute;
+      top: 50%;
+      width: 50%;
+      color: #190b32;
+      font: 900 1rem Arial, sans-serif;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+    }
+
+    #spin-wheel::before {
+      left: 0;
+      content: "50 RATED";
+      transform: rotate(-90deg) translateY(-50%);
+    }
+
+    #spin-wheel::after {
+      right: 0;
+      content: "80 RATED";
+      transform: rotate(90deg) translateY(-50%);
+    }
+
+    #spin-wheel.spinning { transform: rotate(1440deg); }
+
+    #spin-wheel-pointer {
+      position: relative;
+      z-index: 1;
+      margin-bottom: -32px;
+      color: #fff;
+      font-size: 2.4rem;
+      text-shadow: 0 0 12px #fff;
+    }
+
+    #spin-button {
+      padding: 14px 36px;
+      border: 3px solid #fff;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #ff3fb4, #ffdf35, #3df7ff);
+      color: #18092c;
+      font: 900 1.2rem Arial, sans-serif;
+      box-shadow: 0 0 20px #fff;
+      cursor: pointer;
+    }
+
+    #spin-result {
+      min-height: 1.5em;
+      color: #fff;
+      font: 700 1rem Arial, sans-serif;
+    }
+
+    #spin-result.won {
+      display: table;
+      margin: 12px auto;
+      padding: 10px 16px;
+      border: 2px solid #ffe94a;
+      border-radius: 12px;
+      background: rgba(255,233,74,0.16);
+      color: #ffe94a;
+      font-size: 1.2rem;
+      text-shadow: 0 0 12px #ffe94a;
+      animation: winnerPop 0.35s ease-out;
+    }
+
+    @keyframes winnerPop {
+      from { opacity: 0; transform: scale(0.65); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes wheelGlow {
+      from { filter: brightness(0.9); }
+      to { filter: brightness(1.25); }
     }
 
     #upgrade-player-name {
@@ -825,6 +1012,11 @@
         position: static;
         margin: -18px 0 20px;
       }
+      #mode-control {
+        position: static;
+        margin: -18px 0 20px;
+      }
+      #team-roster-hud { right: 8px; top: 140px; max-width: 170px; font-size: 0.68rem; }
       #profile-slots { bottom: 12px; gap: 7px; }
       .profile-slot { width: min(20vw, 72px); height: 58px; font-size: 0.68rem; }
       #profile-name-form { bottom: 82px; }
@@ -867,31 +1059,41 @@
     <h1>NBA 2K27 · TIP-OFF</h1>
     <div class="matchup">
       <div class="team-card">
-        <div class="team-title">WARRIORS</div>
+        <div class="team-title">GOLDEN STATE WARRIORS</div>
         <div class="team-ball" aria-hidden="true">
           🏀
         </div>
       </div>
       <div class="versus">VS</div>
-      <div class="team-card red">
-        <div class="team-title">RAPTORS</div>
+      <div id="opponent-team-card" class="team-card">
+        <div id="opponent-team-title" class="team-title" aria-live="polite"></div>
         <div class="team-ball" aria-hidden="true">
           🏀
         </div>
       </div>
     </div>
+    <label id="mode-control" for="game-mode-select">
+      GAME MODE
+      <select id="game-mode-select">
+        <option value="1v1">1v1</option>
+        <option value="3v3">3v3</option>
+        <option value="5v5">5v5</option>
+      </select>
+    </label>
     <label id="difficulty-control" for="difficulty-select">
       CPU DIFFICULTY
       <select id="difficulty-select">
         <option value="rookie">Rookie</option>
         <option value="pro">Pro</option>
-        <option value="hallOfFamer">Hall of Famer</option>
+        <option value="hallOfFamer">Hall of Fame</option>
         <option value="legend">Legend</option>
       </select>
     </label>
     <button id="tipoff-btn" type="button">TIP OFF</button>
     <button id="delete-profile-btn" type="button" aria-label="Delete selected player profile" title="Delete selected profile">🗑</button>
+    <button id="upgrade-profile-btn" type="button">UPGRADE SELECTED PLAYER</button>
     <div id="profile-slots" aria-label="Player profiles"></div>
+    <div id="roster-selection-hint" aria-live="polite"></div>
     <form id="profile-name-form">
       <input id="profile-name-input" type="text" maxlength="20" autocomplete="off" placeholder="Enter player name" aria-label="Player name" />
       <p id="profile-name-error" role="alert" aria-live="polite"></p>
@@ -908,6 +1110,7 @@
 
     <div id="hud">WARRIORS 0 | 0 RAPTORS</div>
     <div id="shot-clock" aria-label="24 second shot clock">24</div>
+    <div id="team-roster-hud" aria-live="polite"></div>
 
     <div id="rules-panel">
       <h2>Basketball Rules</h2>
@@ -920,7 +1123,7 @@
         <li>Press E to steal the ball; a failed steal gives the CPU 1 point.</li>
         <li>Press Q near the hoop for a dunk or layup.</li>
         <li>Make two 3-pointers in a row, then press F for the super dunk.</li>
-        <li>Make five layups in a row, then press G to freeze your opponent for 2-4 seconds.</li>
+        <li>Make four layups or dunks in a row, then press G to freeze your opponent for 2-4 seconds.</li>
         <li>First to 21 wins.</li>
       </ul>
     </div>
@@ -943,19 +1146,24 @@
       <strong>CONTROLS:</strong><br />
       Move: W A S D<br />
       Sprint: HOLD SHIFT<br />
+      Pass &amp; switch: P (team modes)<br />
       <span id="sprint-status">SPRINT READY</span><br />
       Shoot: HOLD SPACE<br />
       Block: HOLD R<br />
       Steal: E<br />
       Finish near hoop: Q (layup / dunk)<br />
-      Ankle breaker: G (after 5 layups)
+      Ankle breaker: G (after 4 layups or dunks)
+      <div id="pass-switch-control" class="super-dunk-control" title="Pass and switch to an open teammate with P">
+        <button id="pass-switch-btn" type="button">P</button>
+        <span>PASS &amp; SWITCH</span>
+      </div>
       <div class="super-dunk-control" title="Make two 3-pointers in a row, then press F">
         <button id="super-dunk-btn" type="button" aria-label="Super dunk locked" disabled>⚡</button>
         <span class="super-dunk-charge" aria-hidden="true"><span></span><span></span></span>
       </div>
-      <div class="super-dunk-control" title="Make five layups in a row, then press G">
+      <div class="super-dunk-control" title="Make four layups or dunks in a row, then press G">
         <button id="ankle-breaker-btn" type="button" aria-label="Ankle breaker locked" disabled>↝</button>
-        <span class="super-dunk-charge" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        <span class="super-dunk-charge" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
       </div>
     </div>
   </div>
@@ -1075,11 +1283,53 @@
     <div class="poster-subtitle">FLATTENED</div>
   </div>
 
+  <div id="spin-wheel-screen" role="dialog" aria-modal="true" aria-labelledby="spin-title">
+    <div id="spin-wheel-box">
+      <h2 id="spin-title">TEAMMATE WHEEL</h2>
+      <p id="spin-result">Spin to pick a 50- or 80-rated CPU teammate.</p>
+      <div id="spin-wheel-pointer" aria-hidden="true">▼</div>
+      <div id="spin-wheel" aria-hidden="true"></div>
+      <button id="spin-button" type="button">SPIN</button>
+    </div>
+  </div>
+
   <script>
     const progressStorageKey = 'nba2k27-warriors-progression';
     const profileStorageKey = 'nba2k27-player-profiles';
     const attributeNames = ['speed', 'threePoint', 'layupDunk', 'steal', 'block', 'blockRange'];
     const powerUpNames = ['superDunk', 'ankleBreaker'];
+    const userTeamJerseyColor = 0x1d428a;
+    const opponentTeams = [
+      { name: 'Atlanta Hawks', color: '#E03A3E' },
+      { name: 'Boston Celtics', color: '#007A33' },
+      { name: 'Brooklyn Nets', color: '#111111' },
+      { name: 'Charlotte Hornets', color: '#008C8C' },
+      { name: 'Chicago Bulls', color: '#CE1141' },
+      { name: 'Cleveland Cavaliers', color: '#6F263D' },
+      { name: 'Dallas Mavericks', color: '#00538C', jerseyColor: '#B8C4CA' },
+      { name: 'Denver Nuggets', color: '#F0B323' },
+      { name: 'Detroit Pistons', color: '#006BB6', jerseyColor: '#B0B7BC' },
+      { name: 'Houston Rockets', color: '#CE1141' },
+      { name: 'Indiana Pacers', color: '#002D62', jerseyColor: '#FDBB30' },
+      { name: 'Los Angeles Clippers', color: '#C8102E' },
+      { name: 'Los Angeles Lakers', color: '#552583' },
+      { name: 'Memphis Grizzlies', color: '#5D76A9', jerseyColor: '#BFC5CB' },
+      { name: 'Miami Heat', color: '#98002E' },
+      { name: 'Milwaukee Bucks', color: '#00471B' },
+      { name: 'Minnesota Timberwolves', color: '#0C2340', jerseyColor: '#C5CED6' },
+      { name: 'New Orleans Pelicans', color: '#0C2340', jerseyColor: '#C1A875' },
+      { name: 'New York Knicks', color: '#006BB6', jerseyColor: '#F58426' },
+      { name: 'Oklahoma City Thunder', color: '#007AC1', jerseyColor: '#EF3B24' },
+      { name: 'Orlando Magic', color: '#0077C0', jerseyColor: '#C0C0C0' },
+      { name: 'Philadelphia 76ers', color: '#006BB6', jerseyColor: '#ED174C' },
+      { name: 'Phoenix Suns', color: '#1D1160' },
+      { name: 'Portland Trail Blazers', color: '#E03A3E' },
+      { name: 'Sacramento Kings', color: '#5A2D81' },
+      { name: 'San Antonio Spurs', color: '#8A8D8F' },
+      { name: 'Toronto Raptors', color: '#CE1141' },
+      { name: 'Utah Jazz', color: '#F9A01B' },
+      { name: 'Washington Wizards', color: '#002B5C', jerseyColor: '#C8102E' }
+    ];
     const upgradeLimits = {
       speed: 9,
       threePoint: 18,
@@ -1103,7 +1353,7 @@
         sprintSpeed: 0.46,
         sprintChance: 0.002,
         sprintDistance: 8,
-        blockRange: 0.75,
+        blockRange: 0.9,
         blockChance: 0.25,
         stealChance: 0.05,
         powerUpChance: 0
@@ -1131,7 +1381,7 @@
         sprintSpeed: 0.53,
         sprintChance: 0.0035,
         sprintDistance: 10,
-        blockRange: 1.2,
+        blockRange: 0.9,
         blockChance: 0.44,
         stealChance: 0.2,
         powerUpChance: 0.004
@@ -1263,6 +1513,7 @@
     const loadedProfiles = loadProfileStore();
     const profileSlots = loadedProfiles.slots;
     let selectedProfileSlot = loadedProfiles.selectedSlot;
+    let selectedRosterSlots = selectedProfileSlot === null ? [] : [selectedProfileSlot];
     let activeProfileSlot = selectedProfileSlot;
     let profileDraftSlot = null;
     let profileDraftName = '';
@@ -1299,6 +1550,20 @@
     const state = {
       player: { x: 0, z: 12, score: 0 },
       cpu: { x: 0, z: 6, score: 0 },
+      gameMode: '1v1',
+      teamRoster: [],
+      teamActors: [],
+      cpuTeamActors: [],
+      controlledActor: null,
+      rewardProfileSlot: null,
+      opponentTeam: null,
+      passTimer: 0,
+      passInProgress: false,
+      passTargetActor: null,
+      passProgress: 0,
+      passOrigin: new THREE.Vector3(),
+      passEndpoint: new THREE.Vector3(),
+      upgradeReturnMode: 'postgame',
       ball: { x: 0, y: 1.2, z: 12 },
       playerSprintTime: 0,
       playerSprintCooldown: 0,
@@ -1373,7 +1638,14 @@
     let inputListenersAdded = false;
     let pauseStartedAt = 0;
     let playerMesh, cpuMesh, ballMesh, hoopGroup;
-    let playerRoot, cpuRoot;
+    let playerRoot, initialPlayerRoot, cpuRoot;
+    let cpuJerseyMaterials = [];
+    let cpuJerseyMarkings = [];
+    let pendingWheelResults = [];
+    let wheelSpinInProgress = false;
+    let wheelAwaitingContinue = false;
+    let wheelAudioContext = null;
+    let wheelAudioUnavailable = false;
     let playerAnim = { leftLeg: null, rightLeg: null, leftArm: null, rightArm: null, torso: null };
     let cpuAnim = { leftLeg: null, rightLeg: null, leftArm: null, rightArm: null, torso: null };
     let courtBounds = { minX: -16, maxX: 16, minZ: -28.8, maxZ: 24 };
@@ -1414,10 +1686,6 @@
     }
 
     function showProfileNameEntry(slotIndex) {
-      selectedProfileSlot = null;
-      activeProfileSlot = null;
-      progression = fallbackProgression;
-      saveProfileStore();
       nameEntrySlot = slotIndex;
       const input = document.getElementById('profile-name-input');
       input.value = '';
@@ -1451,6 +1719,7 @@
     function selectPlayerProfile(slotIndex) {
       if (!profileSlots[slotIndex]) return;
       selectedProfileSlot = slotIndex;
+      selectedRosterSlots = [slotIndex];
       activeProfileSlot = slotIndex;
       profileDraftSlot = null;
       profileDraftName = '';
@@ -1465,9 +1734,14 @@
       if (selectedProfileSlot === null || !profileSlots[selectedProfileSlot]) return;
       if (!window.confirm(`Delete ${profileSlots[selectedProfileSlot].name}'s player profile?`)) return;
       profileSlots[selectedProfileSlot] = null;
+      selectedRosterSlots = selectedRosterSlots.filter(index => index !== selectedProfileSlot);
       selectedProfileSlot = null;
+      selectedProfileSlot = selectedRosterSlots[0] ?? null;
       activeProfileSlot = null;
-      progression = fallbackProgression;
+      activeProfileSlot = selectedProfileSlot;
+      progression = selectedProfileSlot === null
+        ? fallbackProgression
+        : loadProgression(profileSlots[selectedProfileSlot].progression);
       saveProfileStore();
       renderProfileSlots();
     }
@@ -1479,51 +1753,291 @@
       profileSlots.forEach((profile, index) => {
         const button = document.createElement('button');
         button.type = 'button';
-        button.className = `profile-slot${selectedProfileSlot === index ? ' selected' : ''}${profile ? '' : ' profile-slot-empty'}`;
+        const inLineup = selectedRosterSlots.includes(index);
+        button.className = `profile-slot${selectedProfileSlot === index ? ' selected' : ''}${inLineup ? ' lineup-selected' : ''}${profile ? '' : ' profile-slot-empty'}`;
         button.dataset.slot = String(index);
         const profileName = profile ? formatPlayerName(profile.name) : '';
         button.textContent = profile ? profileName : '+';
-        button.setAttribute('aria-label', profile ? `Select ${profileName} profile` : `Create player in slot ${index + 1}`);
-        button.setAttribute('aria-pressed', String(selectedProfileSlot === index));
+        const selectionAction = inLineup && selectedProfileSlot !== index
+          ? 'Focus'
+          : inLineup ? 'Remove' : 'Add';
+        button.setAttribute('aria-label', profile
+          ? `${selectionAction} ${profileName} ${document.getElementById('game-mode-select').value === '1v1' ? 'as player' : 'to lineup'}`
+          : `Create player in slot ${index + 1}`);
+        button.setAttribute('aria-pressed', String(inLineup));
         container.appendChild(button);
       });
       document.getElementById('delete-profile-btn').style.display =
         selectedProfileSlot !== null && profileSlots[selectedProfileSlot] ? 'block' : 'none';
+      document.getElementById('upgrade-profile-btn').style.display =
+        selectedProfileSlot !== null && profileSlots[selectedProfileSlot] ? 'block' : 'none';
+      updateRosterSelectionHint();
+    }
+
+    function updateRosterSelectionHint(message = '') {
+      const hint = document.getElementById('roster-selection-hint');
+      if (!hint) return;
+      if (message) {
+        hint.textContent = message;
+        return;
+      }
+      const mode = document.getElementById('game-mode-select').value;
+      hint.textContent = mode === '1v1'
+        ? 'Select one created player for 1v1.'
+        : `Select up to ${getTeamSize()} created players · ${selectedRosterSlots.length} selected · remaining slots use CPU teammates.`;
+    }
+
+    function getTeamSize() {
+      const mode = document.getElementById('game-mode-select').value;
+      return mode === '5v5' ? 5 : mode === '3v3' ? 3 : 1;
+    }
+
+    function toggleRosterProfile(slotIndex) {
+      if (!profileSlots[slotIndex]) return;
+      if (document.getElementById('game-mode-select').value === '1v1') {
+        selectPlayerProfile(slotIndex);
+        return;
+      }
+
+      const existingIndex = selectedRosterSlots.indexOf(slotIndex);
+      if (existingIndex >= 0) {
+        if (selectedProfileSlot !== slotIndex) {
+          selectedProfileSlot = slotIndex;
+          activeProfileSlot = slotIndex;
+          progression = loadProgression(profileSlots[slotIndex].progression);
+        } else {
+          selectedRosterSlots.splice(existingIndex, 1);
+          selectedProfileSlot = selectedRosterSlots[0] ?? null;
+          activeProfileSlot = selectedProfileSlot;
+          progression = selectedProfileSlot === null
+            ? fallbackProgression
+            : loadProgression(profileSlots[selectedProfileSlot].progression);
+        }
+      } else {
+        if (selectedRosterSlots.length >= getTeamSize()) {
+          updateRosterSelectionHint(`LINEUP FULL · ${getTeamSize()} PLAYERS MAX`);
+          return;
+        }
+        selectedRosterSlots.push(slotIndex);
+        selectedProfileSlot = slotIndex;
+        activeProfileSlot = slotIndex;
+        progression = loadProgression(profileSlots[slotIndex].progression);
+      }
+      profileDraftSlot = null;
+      profileDraftName = '';
+      hideProfileNameEntry();
+      saveProfileStore();
+      renderProfileSlots();
+      renderUpgrades();
+    }
+
+    function prepareTeamRoster() {
+      if (state.gameMode === '1v1') {
+        state.teamRoster = [];
+        pendingWheelResults = [];
+        const active = selectedProfileSlot === null
+          ? { name: 'STEPHEN CURRY', source: 'default', progression, profileSlot: null }
+          : {
+            name: profileSlots[selectedProfileSlot].name,
+            source: 'profile',
+            progression: loadProgression(profileSlots[selectedProfileSlot].progression),
+            profileSlot: selectedProfileSlot
+          };
+        state.controlledActor = active;
+        state.rewardProfileSlot = active.profileSlot;
+        return;
+      }
+
+      const selectedProfiles = selectedRosterSlots
+        .filter(index => profileSlots[index])
+        .slice(0, getTeamSize())
+        .map(index => ({
+          name: profileSlots[index].name,
+          source: 'profile',
+          progression: loadProgression(profileSlots[index].progression),
+          profileSlot: index
+        }));
+      const roster = selectedProfiles.length > 0
+        ? selectedProfiles
+        : [{ name: 'STEPHEN CURRY', source: 'default', progression, profileSlot: null }];
+
+      const missingSlots = getTeamSize() - roster.length;
+      const autoRatings = state.gameMode === '3v3' && roster.length === 1
+        ? [50, 80]
+          : [];
+      pendingWheelResults = [];
+      for (let index = 0; index < missingSlots; index += 1) {
+        if (autoRatings[index] !== undefined) {
+          const rating = autoRatings[index];
+          roster.push({ name: `CPU · ${rating}`, source: 'cpu', rating, progression: loadProgression() });
+        } else {
+          roster.push({ name: 'CPU Teammate', source: 'cpu', rating: null, progression: loadProgression() });
+          pendingWheelResults.push(roster.length - 1);
+        }
+      }
+      state.teamRoster = roster;
+      state.controlledActor = roster[0];
+      state.rewardProfileSlot = roster[0].profileSlot ?? null;
+    }
+
+    function continueTipOff() {
+      document.getElementById('loading-screen').style.display = 'none';
+      const intro = document.getElementById('intro-cinematic');
+      const text = document.getElementById('cinematic-text');
+      intro.style.display = 'flex';
+      const playerName = selectedProfileSlot === null ? 'Stephen Curry' : profileSlots[selectedProfileSlot].name;
+      setTimeout(() => { text.textContent = 'THE TEAMS ARE WALKING OUT...'; }, 1000);
+      setTimeout(() => { text.textContent = `${playerName.toUpperCase()} IS WARMING UP...`; }, 2200);
+      setTimeout(() => { text.textContent = `TIP-OFF · ${state.gameMode.toUpperCase()}`; }, 3400);
+      setTimeout(() => {
+        intro.style.display = 'none';
+        state.gameEnded = false;
+        state.paused = false;
+        document.getElementById('game-container').style.display = 'block';
+        try {
+          initGame();
+        } catch (error) {
+          const message = document.getElementById('graphics-error');
+          message.textContent = `The game could not start its 3D graphics. Check that WebGL and hardware acceleration are enabled in your browser, then refresh. (${error.message})`;
+          message.style.display = 'flex';
+          console.error('Basketball game initialization failed:', error);
+        }
+      }, 4600);
+    }
+
+    function selectOpponentTeam() {
+      state.opponentTeam = opponentTeams[Math.floor(Math.random() * opponentTeams.length)];
+      const jerseyColor = state.opponentTeam.jerseyColor ?? state.opponentTeam.color;
+      const card = document.getElementById('opponent-team-card');
+      const title = document.getElementById('opponent-team-title');
+      title.textContent = state.opponentTeam.name.toUpperCase();
+      card.style.borderColor = state.opponentTeam.color;
+      card.style.boxShadow = `0 0 24px ${state.opponentTeam.color}70`;
+      cpuJerseyMaterials.forEach(material => material.color.set(jerseyColor));
+      state.cpuTeamActors.forEach(actor => actor.jerseyMaterial.color.set(jerseyColor));
+      cpuJerseyMarkings.forEach(marking => {
+        if (!marking) return;
+        const context = marking.userData.canvas.getContext('2d');
+        drawJerseyMarking(context, state.opponentTeam.name.toUpperCase(), '4');
+        marking.userData.texture.needsUpdate = true;
+      });
+      updateHud();
+    }
+
+    function showNextWheelSpin() {
+      wheelAwaitingContinue = false;
+      document.getElementById('spin-result').classList.remove('won');
+      if (pendingWheelResults.length === 0) {
+        document.getElementById('spin-wheel-screen').style.display = 'none';
+        continueTipOff();
+        return;
+      }
+      document.getElementById('spin-result').textContent =
+        `Spin for CPU teammate ${pendingWheelResults[0] + 1}.`;
+      document.getElementById('spin-button').disabled = false;
+      document.getElementById('spin-button').textContent = 'SPIN';
+      document.getElementById('spin-wheel').classList.remove('spinning');
+    }
+
+    function playWheelTick(progress) {
+      const AudioContextType = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextType || wheelAudioUnavailable) return;
+      try {
+        wheelAudioContext ??= new AudioContextType();
+      } catch (error) {
+        wheelAudioUnavailable = true;
+        console.error('Could not initialize spin-wheel audio:', error);
+        return;
+      }
+      if (wheelAudioContext.state === 'suspended') {
+        wheelAudioContext.resume().catch(error => console.error('Could not resume spin-wheel audio:', error));
+      }
+      const oscillator = wheelAudioContext.createOscillator();
+      const volume = wheelAudioContext.createGain();
+      oscillator.frequency.value = 760 - progress * 400;
+      volume.gain.setValueAtTime(0.035, wheelAudioContext.currentTime);
+      volume.gain.exponentialRampToValueAtTime(0.001, wheelAudioContext.currentTime + 0.04);
+      oscillator.connect(volume);
+      volume.connect(wheelAudioContext.destination);
+      oscillator.start();
+      oscillator.stop(wheelAudioContext.currentTime + 0.04);
+    }
+
+    function spinForTeammate() {
+      if (wheelAwaitingContinue) {
+        showNextWheelSpin();
+        return;
+      }
+      if (wheelSpinInProgress || pendingWheelResults.length === 0) return;
+      wheelSpinInProgress = true;
+      const button = document.getElementById('spin-button');
+      const wheel = document.getElementById('spin-wheel');
+      const box = document.getElementById('spin-wheel-box');
+      const rating = Math.random() < 0.5 ? 50 : 80;
+      const rosterIndex = pendingWheelResults.shift();
+      state.teamRoster[rosterIndex].rating = rating;
+      state.teamRoster[rosterIndex].name = `CPU · ${rating}`;
+      button.disabled = true;
+      button.textContent = 'SPINNING...';
+      document.getElementById('spin-result').textContent = 'The wheel is spinning!';
+      document.getElementById('spin-result').classList.remove('won');
+      wheel.classList.remove('spinning');
+      wheel.style.transform = 'rotate(0deg)';
+      void wheel.offsetWidth;
+      wheel.classList.add('spinning');
+      const spinStartedAt = performance.now();
+      let tickTimer;
+      let tickCount = 0;
+      const tick = () => {
+        const progress = Math.min((performance.now() - spinStartedAt) / 3900, 1);
+        if (progress >= 1) return;
+        box.classList.toggle('wheel-tick', tickCount % 2 === 0);
+        tickCount += 1;
+        playWheelTick(progress);
+        tickTimer = setTimeout(tick, 45 + progress * progress * 220);
+      };
+      tick();
+      wheel.style.transform = `rotate(${1440 + (rating === 80 ? 270 : 90)}deg)`;
+      setTimeout(() => {
+        clearTimeout(tickTimer);
+        box.classList.remove('wheel-tick');
+        wheelSpinInProgress = false;
+        const result = document.getElementById('spin-result');
+        result.textContent = `TEAMMATE WON: ${rating}-RATED CPU!`;
+        result.classList.add('won');
+        button.textContent = pendingWheelResults.length ? 'NEXT SPIN' : 'CONTINUE';
+        button.disabled = false;
+        wheelAwaitingContinue = true;
+      }, 3900);
     }
 
     function startGameIntro() {
       document.getElementById('tipoff-btn').addEventListener('click', () => {
+        if (gameResultRecorded) restartGame();
         state.difficulty = document.getElementById('difficulty-select').value;
-        document.getElementById('loading-screen').style.display = 'none';
-        const intro = document.getElementById('intro-cinematic');
-        const text = document.getElementById('cinematic-text');
-        intro.style.display = 'flex';
-
-        setTimeout(() => { text.textContent = 'THE TEAMS ARE WALKING OUT...'; }, 1000);
-        const playerName = selectedProfileSlot === null ? 'Stephen Curry' : profileSlots[selectedProfileSlot].name;
-        setTimeout(() => { text.textContent = `${playerName.toUpperCase()} IS WARMING UP...`; }, 2200);
-        setTimeout(() => { text.textContent = 'TIP-OFF'; }, 3400);
-        setTimeout(() => {
-          intro.style.display = 'none';
-          state.gameEnded = false;
-          state.paused = false;
-          document.getElementById('game-container').style.display = 'block';
-          try {
-            initGame();
-          } catch (error) {
-            const message = document.getElementById('graphics-error');
-              message.textContent = `The game could not start its 3D graphics. Check that WebGL and hardware acceleration are enabled in your browser, then refresh. (${error.message})`;
-            message.style.display = 'flex';
-            console.error('Basketball game initialization failed:', error);
-          }
-        }, 4600);
+        state.gameMode = document.getElementById('game-mode-select').value;
+        selectOpponentTeam();
+        prepareTeamRoster();
+        progression = state.controlledActor.progression;
+        activeProfileSlot = state.controlledActor.profileSlot;
+        if (activeProfileSlot !== null) selectedProfileSlot = activeProfileSlot;
+        if (pendingWheelResults.length > 0) {
+          document.getElementById('loading-screen').style.display = 'none';
+          document.getElementById('spin-wheel-screen').style.display = 'flex';
+          showNextWheelSpin();
+          return;
+        }
+        continueTipOff();
       });
       document.getElementById('next-btn').addEventListener('click', () => {
         restartGame();
       });
       document.getElementById('reset-record-btn').addEventListener('click', resetRecord);
-      document.getElementById('open-upgrades-btn').addEventListener('click', openUpgradeScreen);
+      document.getElementById('open-upgrades-btn').addEventListener('click', () => openUpgradeScreen('postgame'));
       document.getElementById('next-from-upgrades-btn').addEventListener('click', finishUpgradeScreen);
+      document.getElementById('upgrade-profile-btn').addEventListener('click', openSelectedProfileUpgrade);
+      document.getElementById('pass-switch-btn').addEventListener('click', passAndSwitch);
+      document.getElementById('spin-button').addEventListener('click', spinForTeammate);
       document.getElementById('resume-btn').addEventListener('click', resumeGame);
       document.querySelectorAll('.upgrade-button').forEach(button => {
         button.addEventListener('click', () => purchaseUpgrade(button.dataset.upgrade));
@@ -1533,7 +2047,7 @@
         if (!slotButton) return;
         const slotIndex = Number(slotButton.dataset.slot);
         if (profileSlots[slotIndex]) {
-          selectPlayerProfile(slotIndex);
+          toggleRosterProfile(slotIndex);
         } else {
           showProfileNameEntry(slotIndex);
         }
@@ -1546,6 +2060,17 @@
         submitProfileName();
       });
       document.getElementById('delete-profile-btn').addEventListener('click', deleteSelectedProfile);
+      document.getElementById('game-mode-select').addEventListener('change', () => {
+        if (document.getElementById('game-mode-select').value === '1v1') {
+          selectedRosterSlots = selectedProfileSlot === null ? [] : [selectedProfileSlot];
+        } else {
+          selectedRosterSlots = selectedRosterSlots.slice(0, getTeamSize());
+          if (selectedRosterSlots.length === 0 && selectedProfileSlot !== null) {
+            selectedRosterSlots = [selectedProfileSlot];
+          }
+        }
+        renderProfileSlots();
+      });
       document.addEventListener('click', event => {
         if (document.getElementById('profile-name-form').style.display !== 'block') return;
         if (event.target.closest('#profile-name-form') || event.target.closest('.profile-slot-empty')) return;
@@ -1595,6 +2120,7 @@
 
       updateHud();
       updateShotGreenZone();
+      setupTeamActors();
       if (!animationStarted) {
         animate();
         animationStarted = true;
@@ -1736,10 +2262,11 @@
 
     function createPlayer() {
       playerRoot = new THREE.Group();
+      initialPlayerRoot = playerRoot;
       playerRoot.position.set(state.player.x, 0, state.player.z);
       scene.add(playerRoot);
 
-      const jerseyMat = new THREE.MeshStandardMaterial({ color: 0x1d428a, roughness: 0.72 });
+      const jerseyMat = new THREE.MeshStandardMaterial({ color: userTeamJerseyColor, roughness: 0.72 });
       const skinMat = new THREE.MeshStandardMaterial({ color: 0xf1d1a1, roughness: 0.8 });
       const shortMat = new THREE.MeshStandardMaterial({ color: 0x2d2d2d, roughness: 0.85 });
       const shoeMat = new THREE.MeshStandardMaterial({ color: 0x171717, roughness: 0.8 });
@@ -1804,7 +2331,11 @@
       cpuRoot.position.set(state.cpu.x, 0, state.cpu.z);
       scene.add(cpuRoot);
 
-      const jerseyMat = new THREE.MeshStandardMaterial({ color: 0xce1141, roughness: 0.72 });
+      const jerseyMat = new THREE.MeshStandardMaterial({
+        color: state.opponentTeam?.jerseyColor ?? state.opponentTeam?.color ?? 0xce1141,
+        roughness: 0.72
+      });
+      cpuJerseyMaterials.push(jerseyMat);
       const skinMat = new THREE.MeshStandardMaterial({ color: 0xf0c7a1, roughness: 0.8 });
       const shortMat = new THREE.MeshStandardMaterial({ color: 0x2b2b2b, roughness: 0.9 });
       const shoeMat = new THREE.MeshStandardMaterial({ color: 0x171717, roughness: 0.8 });
@@ -1812,7 +2343,7 @@
       const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.8, 2.2, 8, 12), jerseyMat);
       torso.position.y = 2.9;
       cpuRoot.add(torso);
-      addJerseyMarking(cpuRoot, 'RAPTORS', '4');
+      cpuJerseyMarkings.push(addJerseyMarking(cpuRoot, state.opponentTeam?.name ?? 'RAPTORS', '4'));
       cpuAnim.torso = torso;
 
       const head = new THREE.Mesh(new THREE.SphereGeometry(0.56, 20, 20), skinMat);
@@ -1864,26 +2395,285 @@
       cpuAnim.rightLeg = rightLeg;
     }
 
+    function makeTeamActor(jersey, name, x, z, member = {}) {
+      const root = new THREE.Group();
+      const jerseyMaterial = new THREE.MeshStandardMaterial({ color: jersey, roughness: 0.78 });
+      const body = new THREE.Mesh(
+        new THREE.CapsuleGeometry(0.65, 1.9, 5, 8),
+        jerseyMaterial
+      );
+      body.position.y = 2.7;
+      root.add(body);
+      const head = new THREE.Mesh(
+        new THREE.SphereGeometry(0.43, 12, 10),
+        new THREE.MeshStandardMaterial({ color: 0xe1b58e, roughness: 0.85 })
+      );
+      head.position.y = 4.45;
+      root.add(head);
+      root.position.set(x, 0, z);
+      root.userData.playerName = name;
+      scene.add(root);
+      return {
+        ...member,
+        name,
+        x,
+        z,
+        mesh: root,
+        jerseyMaterial,
+        shootCooldown: 3 + Math.random() * 3,
+        lane: Math.random() * Math.PI * 2
+      };
+    }
+
+    function setupTeamActors() {
+      playerRoot = initialPlayerRoot;
+      playerRoot.position.set(state.player.x, 0, state.player.z);
+      [...state.teamActors, ...state.cpuTeamActors].forEach(actor => {
+        if (actor.mesh === initialPlayerRoot) return;
+        scene.remove(actor.mesh);
+        actor.mesh.traverse(child => {
+          if (!child.isMesh) return;
+          child.geometry.dispose();
+          const materials = Array.isArray(child.material) ? child.material : [child.material];
+          materials.forEach(material => material.dispose());
+        });
+      });
+      state.teamActors = [];
+      state.cpuTeamActors = [];
+      state.controlledActor = {
+        ...(state.controlledActor ?? { name: 'STEPHEN CURRY', progression, profileSlot: null, source: 'default' }),
+        x: state.player.x,
+        z: state.player.z,
+        mesh: playerRoot
+      };
+      const rosterHud = document.getElementById('team-roster-hud');
+      const passControl = document.getElementById('pass-switch-control');
+      if (state.gameMode === '1v1' || state.teamRoster.length === 0) {
+        rosterHud.textContent = '';
+        rosterHud.style.display = 'none';
+        passControl.style.display = 'none';
+        return;
+      }
+
+      rosterHud.style.display = 'block';
+      passControl.style.display = 'flex';
+      const offsets = [
+        [-7, -1], [7, -2], [-10, 8], [10, 8]
+      ];
+      state.teamRoster.slice(1).forEach((member, index) => {
+        const [x, z] = offsets[index] ?? [index % 2 ? 9 : -9, 5 + index];
+        state.teamActors.push(makeTeamActor(
+          userTeamJerseyColor,
+          member.name,
+          x,
+          z,
+          { ...member, progression: loadProgression(member.progression) }
+        ));
+        const mirroredX = -x;
+        state.cpuTeamActors.push(makeTeamActor(
+          state.opponentTeam?.jerseyColor ?? state.opponentTeam?.color ?? 0xce1141,
+          `${state.opponentTeam?.name ?? 'RAPTORS'} ${index + 5}`,
+          mirroredX,
+          z - 4
+        ));
+      });
+      updateTeamRosterHud();
+      updatePassSwitchControl();
+    }
+
+    function updateTeamRosterHud() {
+      const rosterHud = document.getElementById('team-roster-hud');
+      if (!rosterHud || state.gameMode === '1v1') return;
+      rosterHud.textContent = `${state.gameMode.toUpperCase()} · CONTROL: ${state.controlledActor?.name ?? 'PLAYER'}\n`
+        + [state.controlledActor, ...state.teamActors].filter(Boolean)
+          .map((member, index) => `${index === 0 ? '▶ ' : '  '}${member.name}`)
+          .join('\n');
+    }
+
+    function updatePassSwitchControl() {
+      const button = document.getElementById('pass-switch-btn');
+      if (!button) return;
+      const canPass = state.gameMode !== '1v1'
+        && state.possession === 'player'
+        && state.possessionResetTimer <= 0
+        && state.passTimer <= 0
+        && !state.gameEnded
+        && !state.shotAnimation
+        && !state.dunkActive
+        && !state.passInProgress
+        && state.teamActors.length > 0;
+      button.disabled = !canPass;
+      button.classList.toggle('ready', canPass);
+    }
+
+    function moveTeamActorToward(actor, targetX, targetZ, speed) {
+      const dx = targetX - actor.x;
+      const dz = targetZ - actor.z;
+      const distance = Math.hypot(dx, dz);
+      const speedAttribute = actor.progression?.attributes.speed ?? 2;
+      const actorSpeed = speed * (1 + (speedAttribute - 2) * 0.05);
+      if (distance > actorSpeed && distance > 0) {
+        actor.x += dx / distance * actorSpeed;
+        actor.z += dz / distance * actorSpeed;
+      } else {
+        actor.x = targetX;
+        actor.z = targetZ;
+      }
+      actor.x = THREE.MathUtils.clamp(actor.x, -15.8, 15.8);
+      actor.z = THREE.MathUtils.clamp(actor.z, courtBounds.minZ, courtBounds.maxZ);
+      actor.mesh.position.set(actor.x, 0, actor.z);
+    }
+
+    function getCpuTeammateShotMakeChance(isThreePointShot, defenderDistance) {
+      const pro = cpuDifficulties.pro;
+      const openShotDistance = 3.2;
+      const pressure = THREE.MathUtils.clamp((openShotDistance - defenderDistance) / openShotDistance, 0, 1);
+      const openChance = isThreePointShot ? pro.threePointChance : pro.openShotChance;
+      return Math.max(0, openChance - pressure * pro.contestedShotPenalty);
+    }
+
+    function updateTeamActors(t) {
+      if (state.gameMode === '1v1' || state.teamActors.length === 0) return;
+      const offense = state.possession === 'player';
+      state.teamActors.forEach((actor, index) => {
+        actor.mesh.visible = true;
+        if (state.passInProgress && actor === state.passTargetActor) return;
+        if (offense) {
+          const cycle = Math.floor(t / 2600) + index * 2;
+          const radius = cycle % 3 === 0 ? 8.8 : cycle % 3 === 1 ? 13 : 17.3;
+          const angle = t * 0.0013 + index * Math.PI * 2 / state.teamActors.length + cycle * 0.8;
+          const targetX = Math.cos(angle) * radius;
+          const targetZ = hoopZ + Math.sin(angle) * radius;
+          moveTeamActorToward(actor, targetX, targetZ, 0.12);
+          const defender = state.cpuTeamActors[index];
+          if (defender) moveTeamActorToward(defender, actor.x, actor.z, getCpuDifficulty().defenseSpeed);
+        } else {
+          const defender = state.cpuTeamActors[index];
+          const target = defender ?? state.cpu;
+          moveTeamActorToward(actor, target.x, target.z, getCpuDifficulty().defenseSpeed);
+        }
+      });
+      state.cpuTeamActors.forEach((actor, index) => {
+        if (!offense) {
+          const cycle = Math.floor(t / 3000) + index;
+          const radius = cycle % 2 ? 15.5 : 10.5;
+          const angle = t * 0.001 + actor.lane + index * 1.4;
+          const targetX = Math.cos(angle) * radius;
+          const targetZ = hoopZ + Math.sin(angle) * radius;
+          moveTeamActorToward(actor, targetX, targetZ, getCpuDifficulty().offenseSpeed);
+          actor.shootCooldown -= 0.016;
+          if (!state.shotAnimation && !state.dunkActive && actor.shootCooldown <= 0) {
+            const isThree = Math.hypot(actor.x, actor.z - hoopZ) > 15.2;
+            const defenderDistance = Math.min(
+              Math.hypot(actor.x - state.player.x, actor.z - state.player.z),
+              ...state.teamActors.map(teammate => Math.hypot(actor.x - teammate.x, actor.z - teammate.z))
+            );
+            if (Math.random() < getCpuTeammateShotMakeChance(isThree, defenderDistance)) {
+              state.cpu.score += isThree ? 3 : 2;
+              updateHud();
+              checkWinCondition();
+              showActionStatus('CPU TEAMMATE SCORES', '#ff4a4a');
+              awardPossession('player', 'cpu');
+            }
+            actor.shootCooldown = 6 + Math.random() * 4;
+          }
+        } else {
+          const target = state.teamActors[index] ?? state.player;
+          moveTeamActorToward(actor, target.x, target.z, getCpuDifficulty().defenseSpeed);
+        }
+      });
+    }
+
+    function passAndSwitch() {
+      if (state.gameMode === '1v1' || state.possession !== 'player' || state.teamActors.length === 0
+        || state.gameEnded || state.passTimer > 0 || state.possessionResetTimer > 0
+        || state.shotAnimation || state.dunkActive || state.passInProgress) return;
+      let bestIndex = -1;
+      let bestSpace = -Infinity;
+      state.teamActors.forEach((actor, index) => {
+        const nearestDefender = state.cpuTeamActors.reduce((nearest, defender) =>
+          Math.min(nearest, Math.hypot(actor.x - defender.x, actor.z - defender.z)),
+        Math.hypot(actor.x - state.cpu.x, actor.z - state.cpu.z));
+        if (nearestDefender > bestSpace) {
+          bestSpace = nearestDefender;
+          bestIndex = index;
+        }
+      });
+      if (bestIndex < 0) return;
+      const receiver = state.teamActors[bestIndex];
+      state.passTargetActor = receiver;
+      state.passProgress = 0;
+      state.passOrigin.set(state.player.x + 0.8, 1.3, state.player.z - 0.7);
+      state.passEndpoint.set(receiver.x + 0.8, 1.3, receiver.z - 0.7);
+      state.passInProgress = true;
+      state.passTimer = 0.55;
+      state.isBallInAir = true;
+      state.canShoot = false;
+      updatePassSwitchControl();
+      showActionStatus(`PASSING TO ${receiver.name}`, '#47ff78');
+    }
+
+    function finishPassAndSwitch() {
+      const receiver = state.passTargetActor;
+      const receiverIndex = state.teamActors.indexOf(receiver);
+      if (!receiver || receiverIndex < 0) {
+        state.passInProgress = false;
+        state.passTargetActor = null;
+        state.isBallInAir = false;
+        state.canShoot = true;
+        return;
+      }
+
+      if (Number.isInteger(state.controlledActor.profileSlot)
+        && profileSlots[state.controlledActor.profileSlot]) {
+        profileSlots[state.controlledActor.profileSlot].progression = progression;
+        saveProfileStore();
+      } else if (state.controlledActor.source === 'default') {
+        saveProgression();
+      }
+      const previous = {
+        ...state.controlledActor,
+        x: state.player.x,
+        z: state.player.z,
+        mesh: playerRoot,
+        progression
+      };
+      state.controlledActor = receiver;
+      state.teamActors[receiverIndex] = previous;
+      previous.mesh.visible = true;
+      state.player.x = receiver.x;
+      state.player.z = receiver.z;
+      playerRoot = receiver.mesh;
+      progression = loadProgression(receiver.progression);
+      state.controlledActor.progression = progression;
+      activeProfileSlot = receiver.profileSlot ?? null;
+      if (activeProfileSlot !== null) selectedProfileSlot = activeProfileSlot;
+      receiver.mesh.position.set(receiver.x, 0, receiver.z);
+      state.ball.x = receiver.x + 0.8;
+      state.ball.y = 1.3;
+      state.ball.z = receiver.z - 0.7;
+      ballMesh.position.set(state.ball.x, state.ball.y, state.ball.z);
+      state.passInProgress = false;
+      state.passTargetActor = null;
+      state.passProgress = 0;
+      state.passTimer = 0.25;
+      state.isBallInAir = false;
+      state.canShoot = true;
+      updateTeamRosterHud();
+      updatePassSwitchControl();
+      renderProfileSlots();
+      updateShotGreenZone();
+      updateBlockGreenZone();
+      showActionStatus(`CAUGHT · ${receiver.name}`, '#47ff78');
+    }
+
     function addJerseyMarking(root, team, number) {
       const canvas = document.createElement('canvas');
       canvas.width = 256;
       canvas.height = 320;
       const context = canvas.getContext('2d');
-      if (context === null) return;
-
-      context.textAlign = 'center';
-      context.lineJoin = 'round';
-      context.strokeStyle = '#17202b';
-      context.fillStyle = '#ffffff';
-      context.font = 'bold 28px Arial';
-      context.lineWidth = 7;
-      context.strokeText(team, 128, 58);
-      context.fillText(team, 128, 58);
-      context.font = 'bold 150px Arial Black, Arial';
-      context.lineWidth = 10;
-      context.strokeText(number, 128, 230);
-      context.fillText(number, 128, 230);
-
+      if (context === null) return null;
+      drawJerseyMarking(context, team, number);
       const texture = new THREE.CanvasTexture(canvas);
       texture.colorSpace = THREE.SRGBColorSpace;
       const marking = new THREE.Mesh(
@@ -1891,7 +2681,27 @@
         new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide })
       );
       marking.position.set(0, 2.95, 0.84);
+      marking.userData.canvas = canvas;
+      marking.userData.texture = texture;
       root.add(marking);
+      return marking;
+    }
+
+    function drawJerseyMarking(context, team, number) {
+      context.textAlign = 'center';
+      context.lineJoin = 'round';
+      context.strokeStyle = '#17202b';
+      context.fillStyle = '#ffffff';
+      context.font = 'bold 28px Arial';
+      context.lineWidth = 7;
+      const shortTeamName = team.toUpperCase().slice(0, 16);
+      context.clearRect(0, 0, 256, 320);
+      context.strokeText(shortTeamName, 128, 58);
+      context.fillText(shortTeamName, 128, 58);
+      context.font = 'bold 150px Arial Black, Arial';
+      context.lineWidth = 10;
+      context.strokeText(number, 128, 230);
+      context.fillText(number, 128, 230);
     }
 
     function createBall() {
@@ -2018,6 +2828,10 @@
 
       if (key === 'g' && !event.repeat) {
         activatePlayerAnkleBreaker();
+      }
+
+      if (key === 'p' && !event.repeat) {
+        passAndSwitch();
       }
 
       if (key === 'r' && state.possession === 'cpu' && !state.gameEnded && !state.blockMeterActive) {
@@ -2272,9 +3086,12 @@
 
       if (!posterPaused && !state.gameEnded && !state.paused) {
         updateSprintTimers(deltaSeconds);
+        state.passTimer = Math.max(0, state.passTimer - deltaSeconds);
+        updatePassSwitchControl();
         updateShotClock(deltaSeconds);
         updatePlayerMovement();
         updateCpuLogic(t);
+        updateTeamActors(now);
         animateCharacterPose(t);
         updateShotMeter();
         updateBlockMeter();
@@ -2286,7 +3103,8 @@
     }
 
     function updateShotClock(deltaSeconds) {
-      if (state.shotAnimation || state.dunkActive || state.possessionResetTimer > 0 || state.gameEnded) return;
+      if (state.shotAnimation || state.dunkActive || state.passInProgress
+        || state.possessionResetTimer > 0 || state.gameEnded) return;
       state.shotClock = Math.max(0, state.shotClock - deltaSeconds);
       document.getElementById('shot-clock').textContent = String(Math.ceil(state.shotClock));
       if (state.shotClock === 0) {
@@ -2308,7 +3126,8 @@
       const moving = state.keys['w'] || state.keys['s'] || state.keys['a'] || state.keys['d'];
       const speedUpgrade = 1 + (progression.attributes.speed - 2) * 0.05;
       const baseSpeed = (state.playerSprintTime > 0 ? 0.42 : 0.24) * speedUpgrade;
-      const speed = moving && state.possessionResetTimer <= 0 && !state.dunkActive && !state.shotAnimation && !state.blockActive ? baseSpeed : 0;
+      const speed = moving && state.possessionResetTimer <= 0 && !state.passInProgress
+        && !state.dunkActive && !state.shotAnimation && !state.blockActive ? baseSpeed : 0;
 
       if (state.keys['w']) state.player.z -= speed;
       if (state.keys['s']) state.player.z += speed;
@@ -2318,7 +3137,6 @@
       state.player.x = THREE.MathUtils.clamp(state.player.x, -15.8, 15.8);
       state.player.z = THREE.MathUtils.clamp(state.player.z, courtBounds.minZ, courtBounds.maxZ);
       playerRoot.position.set(state.player.x, 0, state.player.z);
-
       if (moving && Math.random() < 0.008) {
         state.defenderDelay = 0.8 + Math.random() * 1.4;
       }
@@ -2382,7 +3200,7 @@
       button.classList.toggle('ready', available);
       button.setAttribute('aria-label', available ? 'Ankle breaker ready, press G' : 'Ankle breaker charge');
       const pips = document.querySelectorAll('#ankle-breaker-btn + .super-dunk-charge span');
-      const charge = state.playerAnkleBreakerReady ? 5 : Math.min(state.playerLayupStreak, 5);
+      const charge = state.playerAnkleBreakerReady ? 4 : Math.min(state.playerLayupStreak, 4);
       pips.forEach((pip, index) => pip.classList.toggle('filled', index < charge));
     }
 
@@ -2410,14 +3228,14 @@
       if (shooter === 'player') updateAnkleBreakerStatus();
     }
 
-    function recordLayupMake(shooter, isLayup) {
-      if (!isLayup) {
+    function recordLayupMake(shooter, isLayupOrDunk) {
+      if (!isLayupOrDunk) {
         resetLayupStreak(shooter);
         return;
       }
       const streakKey = `${shooter}LayupStreak`;
       state[streakKey] += 1;
-      if (state[streakKey] >= 5 && (shooter === 'player' || getCpuDifficulty().powerUpChance > 0)) {
+      if (state[streakKey] >= 4 && (shooter === 'player' || getCpuDifficulty().powerUpChance > 0)) {
         state[`${shooter}AnkleBreakerReady`] = true;
       }
       if (shooter === 'player') updateAnkleBreakerStatus();
@@ -2572,7 +3390,8 @@
 
     function attemptCpuSteal() {
       if (state.possession !== 'player' || state.cpuStealCooldown > 0
-        || state.possessionResetTimer > 0 || state.shotAnimation || state.dunkActive || state.blockActive) return false;
+        || state.possessionResetTimer > 0 || state.shotAnimation || state.dunkActive
+        || state.blockActive || state.passInProgress) return false;
       const distance = getPlayerCpuDistance();
       if (distance > 2.9 + getCpuDifficulty().defenseSpeed * 1.5) return false;
       state.cpuStealCooldown = 1.5;
@@ -2586,16 +3405,18 @@
       const playerWalk = playerMoving ? Math.sin(t * 5.2) * 0.5 : 0;
       const cpuWalk = state.cpuFrozenTime > 0 ? 0 : state.possession === 'cpu' ? Math.sin(t * 5.2) * 0.55 : Math.sin(t * 4) * 0.2;
 
-      playerAnim.leftLeg.rotation.x = playerMoving ? playerWalk : 0;
-      playerAnim.rightLeg.rotation.x = playerMoving ? -playerWalk : 0;
-      playerAnim.leftArm.rotation.x = playerMoving ? -playerWalk * 0.9 : 0;
-      playerAnim.rightArm.rotation.x = playerMoving ? playerWalk * 0.9 : 0;
-      playerAnim.torso.rotation.x = playerMoving ? 0.12 : 0;
-      playerAnim.torso.rotation.z = -state.player.x * 0.03;
-      playerAnim.torso.rotation.y = -Math.atan2(
-        (state.keys['d'] ? 1 : 0) - (state.keys['a'] ? 1 : 0),
-        (state.keys['s'] ? 1 : 0) - (state.keys['w'] ? 1 : 0)
-      );
+      if (playerRoot === initialPlayerRoot) {
+        playerAnim.leftLeg.rotation.x = playerMoving ? playerWalk : 0;
+        playerAnim.rightLeg.rotation.x = playerMoving ? -playerWalk : 0;
+        playerAnim.leftArm.rotation.x = playerMoving ? -playerWalk * 0.9 : 0;
+        playerAnim.rightArm.rotation.x = playerMoving ? playerWalk * 0.9 : 0;
+        playerAnim.torso.rotation.x = playerMoving ? 0.12 : 0;
+        playerAnim.torso.rotation.z = -state.player.x * 0.03;
+        playerAnim.torso.rotation.y = -Math.atan2(
+          (state.keys['d'] ? 1 : 0) - (state.keys['a'] ? 1 : 0),
+          (state.keys['s'] ? 1 : 0) - (state.keys['w'] ? 1 : 0)
+        );
+      }
 
       cpuAnim.leftLeg.rotation.x = cpuWalk;
       cpuAnim.rightLeg.rotation.x = -cpuWalk;
@@ -2659,6 +3480,17 @@
     }
 
     function updateBallAndShot() {
+      if (state.passInProgress) {
+        state.passProgress = Math.min(state.passProgress + 0.05, 1);
+        const p = state.passProgress;
+        ballMesh.position.set(
+          THREE.MathUtils.lerp(state.passOrigin.x, state.passEndpoint.x, p),
+          THREE.MathUtils.lerp(state.passOrigin.y, state.passEndpoint.y, p) + 1.2 * 4 * p * (1 - p),
+          THREE.MathUtils.lerp(state.passOrigin.z, state.passEndpoint.z, p)
+        );
+        if (p >= 1) finishPassAndSwitch();
+        return;
+      }
       if (state.blockActive) {
         state.blockProgress = Math.min(state.blockProgress + 0.045, 1);
         const jump = Math.sin(state.blockProgress * Math.PI) * 2.1;
@@ -2700,7 +3532,7 @@
               const scorer = state.dunkShooter;
               const points = state.dunkType === 'super' ? state.superDunkPoints : 2;
               state[scorer].score += points;
-              recordLayupMake(scorer, state.dunkType === 'layup');
+              recordLayupMake(scorer, state.dunkType !== 'super');
               if (scorer === 'player' && state.dunkType !== 'super') {
                 state.playerThreeStreak = 0;
                 updateSuperDunkStatus();
@@ -2949,7 +3781,8 @@
     }
 
     function updateHud() {
-      document.getElementById('hud').textContent = `WARRIORS ${state.player.score} | ${state.cpu.score} RAPTORS`;
+      const opponentName = state.opponentTeam?.name.toUpperCase() ?? 'RAPTORS';
+      document.getElementById('hud').textContent = `WARRIORS ${state.player.score} | ${state.cpu.score} ${opponentName}`;
       document.getElementById('hud').style.color = '#fff';
     }
 
@@ -2987,6 +3820,20 @@
       state.gameEnded = true;
       state.paused = false;
       gameResultRecorded = true;
+      if (activeProfileSlot !== null) {
+        saveProgression();
+      } else if (state.controlledActor?.source === 'default') {
+        saveProgression();
+      }
+      if (state.rewardProfileSlot !== null && profileSlots[state.rewardProfileSlot]) {
+        selectedProfileSlot = state.rewardProfileSlot;
+        activeProfileSlot = state.rewardProfileSlot;
+        progression = loadProgression(profileSlots[state.rewardProfileSlot].progression);
+      } else {
+        selectedProfileSlot = null;
+        activeProfileSlot = null;
+        progression = fallbackProgression;
+      }
       const won = state.player.score > state.cpu.score;
       if (won) {
         progression.wins += 1;
@@ -2996,7 +3843,9 @@
         progression.losses += 1;
         progression.winStreak = 0;
       }
-      const salaryEarned = won ? progression.salary : getSalaryLossPayout();
+      const modeMultiplier = state.gameMode === '5v5' ? 4 : state.gameMode === '3v3' ? 2 : 1;
+      const winRewards = { rookie: 24, pro: 48, hallOfFamer: 72, legend: 100 };
+      const salaryEarned = won ? winRewards[state.difficulty] * modeMultiplier : getSalaryLossPayout() * modeMultiplier;
       state.lastSalaryEarned = salaryEarned;
       progression.coins += salaryEarned;
       saveProgression();
@@ -3011,6 +3860,7 @@
       document.getElementById('progress-summary').textContent =
         `${progression.coins} coins in bank · ${salaryEarned} earned this game · ${progression.winStreak} game win streak`;
       document.getElementById('end-screen').style.display = 'flex';
+      renderProfileSlots();
     }
 
     function pauseGame() {
@@ -3070,33 +3920,66 @@
       return Math.round(2 + (progression.salary - 2) / (24 - 2) * 6);
     }
 
-    function openUpgradeScreen() {
+    function openUpgradeScreen(returnMode = 'postgame') {
+      state.upgradeReturnMode = returnMode;
       renderUpgrades();
       document.getElementById('end-screen').style.display = 'none';
       document.getElementById('upgrade-screen').style.display = 'flex';
     }
 
-    function finishUpgradeScreen() {
-      if (profileDraftSlot === null) {
-        restartGame();
+    function openSelectedProfileUpgrade() {
+      if (!Number.isInteger(selectedProfileSlot) || !profileSlots[selectedProfileSlot]) {
+        updateRosterSelectionHint('SELECT A CREATED PLAYER TO UPGRADE.');
         return;
       }
-      profileDraftName = formatPlayerName(profileDraftName);
-      profileSlots[profileDraftSlot] = {
-        name: profileDraftName,
-        progression
-      };
-      selectedProfileSlot = profileDraftSlot;
-      activeProfileSlot = profileDraftSlot;
-      profileDraftSlot = null;
-      profileDraftName = '';
-      saveProgression();
-      saveProfileStore();
-      hideProfileNameEntry();
+      activeProfileSlot = selectedProfileSlot;
+      progression = loadProgression(profileSlots[selectedProfileSlot].progression);
+      openUpgradeScreen('tipoff');
+    }
+
+    function finishUpgradeScreen() {
+      if (profileDraftSlot !== null) {
+        profileDraftName = formatPlayerName(profileDraftName);
+        const createdSlot = profileDraftSlot;
+        const priorRosterSlots = selectedRosterSlots.filter(index => profileSlots[index]);
+        profileSlots[profileDraftSlot] = {
+          name: profileDraftName,
+          progression
+        };
+        if (document.getElementById('game-mode-select').value === '1v1') {
+          selectedRosterSlots = [createdSlot];
+        } else if (priorRosterSlots.length < getTeamSize()) {
+          selectedRosterSlots = [...priorRosterSlots, createdSlot];
+        } else {
+          selectedRosterSlots = priorRosterSlots;
+        }
+        selectedProfileSlot = selectedRosterSlots[0] ?? createdSlot;
+        activeProfileSlot = selectedProfileSlot;
+        profileDraftSlot = null;
+        profileDraftName = '';
+        saveProfileStore();
+        progression = loadProgression(profileSlots[selectedProfileSlot].progression);
+        hideProfileNameEntry();
+        document.getElementById('upgrade-screen').style.display = 'none';
+        document.getElementById('upgrade-player-name').style.display = 'none';
+        document.getElementById('end-screen').style.display = 'none';
+        document.getElementById('loading-screen').style.display = 'flex';
+        renderProfileSlots();
+        return;
+      }
       document.getElementById('upgrade-screen').style.display = 'none';
-      document.getElementById('loading-screen').style.display = 'flex';
+      document.getElementById('upgrade-player-name').style.display = 'none';
       document.getElementById('end-screen').style.display = 'none';
-      renderProfileSlots();
+      if (state.upgradeReturnMode === 'tipoff'
+        || (state.upgradeReturnMode === 'postgame' && state.gameMode !== '1v1')) {
+        state.upgradeReturnMode = 'postgame';
+        document.getElementById('game-container').style.display = 'none';
+        document.getElementById('loading-screen').style.display = 'flex';
+        renderProfileSlots();
+        return;
+      }
+      state.upgradeReturnMode = 'postgame';
+      restartGame();
     }
 
     function renderUpgrades() {
@@ -3109,7 +3992,7 @@
       nameDisplay.textContent = profileName;
       nameDisplay.style.display = profileName ? 'block' : 'none';
       document.getElementById('upgrade-wallet').textContent =
-        `${progression.coins} coins · ${progression.salary} coins per win`;
+        `${progression.coins} coins · win rewards vary by difficulty and mode`;
       document.getElementById('upgrade-lock-note').textContent =
         'UPGRADE YOUR WARRIORS · Attributes cost 4 coins for the first five upgrades, then 8 coins. Power-ups cost 8 coins.';
       const stealChance = getPlayerStealChance() * 100;
@@ -3153,13 +4036,13 @@
         ? 'Stun duration: 2–4 seconds'
         : `Stun duration: ${4 + progression.powerUps.ankleBreaker} seconds`;
       document.getElementById('salary-level').textContent =
-        `Earn ${progression.salary} coins for a win; losses pay ${getSalaryLossPayout()} coins.`;
+        `Win reward is difficulty/mode based; losses pay ${getSalaryLossPayout()} coins.`;
       document.getElementById('super-dunk-detail').textContent =
         `Upgrade by 1 point each level · ${Math.max(0, 9 - progression.powerUps.superDunk)} upgrades to max`;
       document.getElementById('ankle-detail').textContent =
         `First upgrade sets 5 seconds · max 10 seconds`;
       document.getElementById('salary-detail').textContent =
-        `Win: up to 24 coins · loss: ${getSalaryLossPayout()} coins (max 8) · upgrades cost 6 coins`;
+        `Loss payout: ${getSalaryLossPayout()} coins (max 8) · upgrades cost 6 coins`;
       document.querySelectorAll('.upgrade-button').forEach(button => {
         const name = button.dataset.upgrade;
         const cost = getUpgradeCost(name);
@@ -3195,7 +4078,7 @@
       updateBlockGreenZone();
       renderUpgrades();
       document.getElementById('upgrade-wallet').textContent =
-        `${progression.coins} coins · ${progression.salary} coins per win`;
+        `${progression.coins} coins · win rewards vary by difficulty and mode`;
     }
 
     function triggerPosterFreeze() {
@@ -3252,6 +4135,10 @@
       state.lastFrameTime = performance.now();
       state.player.x = 0;
       state.player.z = 12;
+      state.passInProgress = false;
+      state.passTargetActor = null;
+      state.passProgress = 0;
+      state.passTimer = 0;
       state.cpu.x = 0;
       state.cpu.z = 6;
       playerRoot.position.set(state.player.x, 0, state.player.z);
