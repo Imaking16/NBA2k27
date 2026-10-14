@@ -1230,6 +1230,10 @@
     const fallbackProgression = loadProgression();
     let progression = fallbackProgression;
 
+    function formatPlayerName(name) {
+      return String(name ?? '').trim().replace(/\s+/g, ' ').toUpperCase().slice(0, 20);
+    }
+
     function loadProfileStore() {
       const emptySlots = Array(4).fill(null);
       try {
@@ -1241,7 +1245,7 @@
           const profile = saved.slots[index];
           if (!profile || typeof profile !== 'object' || typeof profile.name !== 'string'
             || !profile.name.trim() || !profile.progression || typeof profile.progression !== 'object') return null;
-          return { name: profile.name.trim().slice(0, 20), progression: loadProgression(profile.progression) };
+          return { name: formatPlayerName(profile.name), progression: loadProgression(profile.progression) };
         });
         const selectedSlot = Number.isInteger(saved.selectedSlot)
           && saved.selectedSlot >= 0
@@ -1424,7 +1428,7 @@
     }
 
     function submitProfileName() {
-      const name = document.getElementById('profile-name-input').value.trim();
+      const name = formatPlayerName(document.getElementById('profile-name-input').value);
       const error = document.getElementById('profile-name-error');
       if (!isAppropriatePlayerName(name)) {
         error.textContent = 'Please choose an appropriate player name.';
@@ -1437,7 +1441,7 @@
       profileDraftName = name;
       activeProfileSlot = null;
       selectedProfileSlot = null;
-      progression = loadProgression({});
+      progression = loadProgression({ coins: 20 });
       hideProfileNameEntry();
       document.getElementById('loading-screen').style.display = 'none';
       renderUpgrades();
@@ -1477,8 +1481,9 @@
         button.type = 'button';
         button.className = `profile-slot${selectedProfileSlot === index ? ' selected' : ''}${profile ? '' : ' profile-slot-empty'}`;
         button.dataset.slot = String(index);
-        button.textContent = profile ? profile.name : '+';
-        button.setAttribute('aria-label', profile ? `Select ${profile.name} profile` : `Create player in slot ${index + 1}`);
+        const profileName = profile ? formatPlayerName(profile.name) : '';
+        button.textContent = profile ? profileName : '+';
+        button.setAttribute('aria-label', profile ? `Select ${profileName} profile` : `Create player in slot ${index + 1}`);
         button.setAttribute('aria-pressed', String(selectedProfileSlot === index));
         container.appendChild(button);
       });
@@ -1532,6 +1537,9 @@
         } else {
           showProfileNameEntry(slotIndex);
         }
+      });
+      document.getElementById('profile-name-input').addEventListener('input', event => {
+        event.target.value = formatPlayerName(event.target.value);
       });
       document.getElementById('profile-name-form').addEventListener('submit', event => {
         event.preventDefault();
@@ -3073,6 +3081,7 @@
         restartGame();
         return;
       }
+      profileDraftName = formatPlayerName(profileDraftName);
       profileSlots[profileDraftSlot] = {
         name: profileDraftName,
         progression
@@ -3091,11 +3100,11 @@
     }
 
     function renderUpgrades() {
-      const profileName = profileDraftSlot !== null
+      const profileName = formatPlayerName(profileDraftSlot !== null
         ? profileDraftName
         : selectedProfileSlot === null
           ? ''
-          : profileSlots[selectedProfileSlot].name;
+          : profileSlots[selectedProfileSlot].name);
       const nameDisplay = document.getElementById('upgrade-player-name');
       nameDisplay.textContent = profileName;
       nameDisplay.style.display = profileName ? 'block' : 'none';
